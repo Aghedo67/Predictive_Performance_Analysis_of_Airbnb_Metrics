@@ -1,7 +1,3 @@
-!pip install streamlit
-!pip install joblib
-!pip install matplotlib
-
 import streamlit as st
 import joblib
 import numpy as np
