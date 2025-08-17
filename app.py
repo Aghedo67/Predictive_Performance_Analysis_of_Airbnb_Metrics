@@ -16,8 +16,7 @@ import matplotlib.pyplot as plt
 # Add caching for data loading
 @st.cache_data
 def load_data():
-    url = "https://drive.google.com/file/d/1O-RbJ7x7dB8IIrax3UsFH8iJtWOd7Kdt/view?usp=drive_link"
-    dublin_aggregated_df =  pd.read_csv(url)
+    dublin_aggregated_df = pd.read_csv("dublin_aggregated_df.csv")
     raw_df = pd.read_csv('dublin_merged_df.csv.gz', compression='gzip')
     raw_df['date'] = pd.to_datetime(raw_df['date'])
     raw_df['month'] = raw_df['date'].dt.month
