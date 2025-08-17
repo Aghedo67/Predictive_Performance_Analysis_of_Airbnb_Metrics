@@ -4,7 +4,6 @@ lightgbm
 matplotlib
 joblib
 numpy<2
-scikit-surprise
 streamlit
 Pillow
 requests
