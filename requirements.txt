@@ -1,9 +1,10 @@
 pandas
 scikit-learn
-lightgbm
+xgboost
 matplotlib
 joblib
 numpy<2
 streamlit
 Pillow
 requests
+
