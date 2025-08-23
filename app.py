@@ -24,7 +24,7 @@ def load_data():
 
 @st.cache_resource
 def load_model():
-    return joblib.load('lgb_model_log.pkl')
+    return joblib.load('xgb_model_log.pkl')
 
 # Initialize the app
 st.set_page_config(page_title="Airbnb suggestion", layout="wide")
