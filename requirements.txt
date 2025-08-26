@@ -3,8 +3,9 @@ scikit-learn
 xgboost
 matplotlib
 joblib
-numpy<2
+numpy==1.26.4
 streamlit
 Pillow
 requests
+
 
