@@ -24,7 +24,7 @@ def load_data():
 
 @st.cache_resource
 def load_suggestion_model():
-    return joblib.load('baseline_model.pkl')
+    return joblib.load('svd_final_model.pkl')
 
 # Initialize the app
 st.title("Airbnb Suggestion System")
