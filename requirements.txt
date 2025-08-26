@@ -3,9 +3,8 @@ scikit-learn
 xgboost
 matplotlib
 joblib
-numpy
+numpy<2
+scikit-surprise
 streamlit
 Pillow
 requests
-
-
