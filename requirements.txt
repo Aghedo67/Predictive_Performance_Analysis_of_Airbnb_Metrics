@@ -4,8 +4,8 @@ xgboost
 matplotlib
 joblib
 numpy==1.26.4
-scikit-surprise
 streamlit
 Pillow
 requests
+
 
