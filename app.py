@@ -139,7 +139,7 @@ def suggest_price(model, dublin_aggregated_df):
         # Location and Ratings
         neighbourhood = st.selectbox("Neighbourhood:", dublin_aggregated_df['neighbourhood'].unique())
         avg_rating = st.number_input("Rating:", 0.0, 5.0, 4.5)
-        number_of_reviews = st.number_input("Reviews:", 0, 1000, 10)
+        number_of_reviews = st.number_input("Reviews:", 0, 500000, 10)
 
         if st.button("Calculate Price"):
             # Validate and calculate
