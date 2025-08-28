@@ -26,3 +26,7 @@ The model based approached was used for this recommendation system, where algori
 was experimented on. With SVD out performing the rest algorithms with an RMSE of 0.4097.
 
 <img width="263" height="175" alt="image" src="https://github.com/user-attachments/assets/44283fca-cadc-402e-868e-1863df17bd78" />
+
+# Dashboard
+Here is a link to a User Friendly interface for Airbnb Price suggestion:
+https://predictiveperformanceanalysisofairbnbmetrics-ngqume5xlwkuulbkq.streamlit.app/
