@@ -17,10 +17,11 @@ XGBoost out performed the rest with an R2 score of 0.72. Which means 72% of the 
 <img width="468" height="229" alt="image" src="https://github.com/user-attachments/assets/1f6a2be9-78f6-4122-9a20-139b82cd5f21" />
 
 
-	Figure 18 Top important features for XGBoost
  
 <img width="468" height="224" alt="image" src="https://github.com/user-attachments/assets/920b8d8a-5d78-42a2-a366-71bfccad2794" />
 
 ## Colaborative Filtering model
 The model based approached was used for this recommendation system, where algorithm such as BaselineOnly, SlopeOne and SVD
 was experimented on. With SVD out performing the rest algorithms with an RMSE of 0.4097.
+
+<img width="263" height="175" alt="image" src="https://github.com/user-attachments/assets/44283fca-cadc-402e-868e-1863df17bd78" />
