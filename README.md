@@ -16,18 +16,7 @@ XGBoost out performed the rest with an R2 score of 0.72. Which means 72% of the 
  
 <img width="468" height="229" alt="image" src="https://github.com/user-attachments/assets/1f6a2be9-78f6-4122-9a20-139b82cd5f21" />
 
-Table 4 Feature importance for best model
-Features	Importance
-accommodates	0.668172
-bedrooms	0.074514
-property_type_freq	0.039018
-host_listings_count	0.033301
-beds	0.032646
-neighbourhood_freq	0.027544
-host_response_rate	0.027193
-bathrooms	0.027040
-number_of_reviews	0.019629
-avg_rating	0.019389
+
 	Figure 18 Top important features for XGBoost
  
 <img width="468" height="224" alt="image" src="https://github.com/user-attachments/assets/920b8d8a-5d78-42a2-a366-71bfccad2794" />
