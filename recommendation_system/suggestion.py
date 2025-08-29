@@ -125,7 +125,7 @@ def main():
             )
 
             if st.button("Get Recommendations", type="primary"):
-                recommend_airbnbs(user_id, raw_df, svd_final_model.pkl)
+                recommend_airbnbs(user_id, raw_df, final_model)
 
 if __name__ == "__main__":
     main()
