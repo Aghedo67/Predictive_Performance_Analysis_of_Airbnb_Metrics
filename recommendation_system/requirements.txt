@@ -1,7 +1,6 @@
 streamlit
 pandas
-scikit-learn
-scikit-surprise
-joblib
 Pillow
 requests
+joblib
+scikit-surprise
