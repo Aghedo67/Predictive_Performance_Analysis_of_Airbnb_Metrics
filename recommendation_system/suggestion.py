@@ -72,7 +72,7 @@ def recommend_airbnbs(user_id, listings_df, final_model):
             with col1:
                 # Main listing details
                 st.markdown(f"**Description:** {listing['description']}")
-                st.markdown(f"**Price:** R{listing['price']} per night")
+                st.markdown(f"**Price:** £{listing['price']} per night")
                 st.markdown(f"**Location:** {listing['neighbourhood']}")
                 st.markdown(f"**Property Type:** {listing['property_type_freq']}")
 
