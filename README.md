@@ -11,14 +11,6 @@ Four different models were experimented on with Linear regression model being th
 models like Decision Tree, Random Forest and XGBoost were also introduced for better performance.
 XGBoost out performed the rest with an R2 score of 0.72. Which means 72% of the variance predicted price.
 
- Model   R2 score    Train MAE  Test MAE  Train RMSE  Test RMSE
- LR       0.5815    0.3337      0.3530    0.2007      0.2034
- DT       0.6416    0.2824     0.3229    0.1407      0.1742
- RF       0.7118    0.1022     0.2784    0.0208      0.1401
- XGBoost  0.7173    0.1446     0.2803    0.0360      0.1374
-
-
-
  XGBoost learning curve
  	 XGBoost A & C price
  
