@@ -5,6 +5,36 @@ The aim of this project is to predict an Airbnb price predictive model and to al
 That would help property owners in looking to invest in the shortlet business via the Airbnb platform.
 # Models
 Two different models were used Regression Models and Colaborative Filtering
+ Model
+R2 score
+Train MAE 
+Test MAE
+Train RMSE
+Test RMSE
+LR
+0.5815
+0.3337
+0.3530
+0.2007
+0.2034
+Decision Tree
+0.6416
+0.2824
+0.3229
+0.1407
+0.1742
+Random Forest
+0.7118
+0.1022
+0.2784
+0.0208
+0.1401
+XGBoost
+0.7173
+0.1446
+0.2803
+0.0360
+0.1374
 
 ## Regression Models
 Four different models were experimented on with Linear regression model being the benchmark after which more complex
@@ -28,5 +58,6 @@ was experimented on. With SVD out performing the rest algorithms with an RMSE of
 <img width="263" height="175" alt="image" src="https://github.com/user-attachments/assets/44283fca-cadc-402e-868e-1863df17bd78" />
 
 # Dashboard
-Here is a link to a User Friendly interface for Airbnb Price suggestion:
-https://predictiveperformanceanalysisofairbnbmetrics-ngqume5xlwkuulbkq.streamlit.app/
+Here is a link to a User Friendly interface for Airbnb Price suggestion / recommender System:
+https://predictiveperformanceanalysisofairbnbmetrics-ngqume5xlwkuulbkq.streamlit.app/ (Price)
+https://predictiveperformanceanalysisofairbnbmetrics-8bysfmucc3l2hpevc.streamlit.app/ (Recommendation System)
