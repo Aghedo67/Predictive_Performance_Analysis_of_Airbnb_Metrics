@@ -178,5 +178,7 @@ def suggest_price(model, dublin_aggregated_df):
                 return None
 
 suggested_price = suggest_price(loaded_model, dublin_aggregated_df)
-st.write(f"Suggested price: GBP {suggested_price}")
+if suggested_price:
+    st.success(f"### Suggested price: €{suggested_price}")
+#st.write(f"Suggested price: GBP {suggested_price}")
 
