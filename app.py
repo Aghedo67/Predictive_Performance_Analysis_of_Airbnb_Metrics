@@ -98,8 +98,10 @@ with tab2:
         use_container_width=True
     )
 with st.expander("Model Insights: Feature Importance"):
-    if hasattr(loaded_model, 'feature_importances_'):
-        # List features in the exact order the model expects them
+    # Access the 'xgb' step from your pipeline
+    model_step = loaded_model.named_steps['xgb']
+    
+    if hasattr(model_step, 'feature_importances_'):
         feature_names = [
             'host_id', 'host_response_rate', 'host_is_superhost', 
             'host_listings_count', 'accommodates', 'bathrooms', 
@@ -107,16 +109,14 @@ with st.expander("Model Insights: Feature Importance"):
             'neighbourhood_freq', 'property_type_freq'
         ]
         
-        # Create a DataFrame and sort for better visualization
         importances = pd.DataFrame({
             'Feature': feature_names,
-            'Importance': loaded_model.feature_importances_
+            'Importance': model_step.feature_importances_
         }).sort_values(by='Importance', ascending=True)
 
-        # Plot using Streamlit's native bar chart
         st.bar_chart(importances.set_index('Feature'))
     else:
-        st.info("Feature importance data is not available for this model.")
+        st.error("Could not find importance scores in the 'xgb' step.")
 
 # Optimize the suggest_price function
 @st.cache_data
