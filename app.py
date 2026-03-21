@@ -97,7 +97,8 @@ with tab2:
         longitude='longitude',
         use_container_width=True
     )
-with st.expander("Model Insights: Feature Importance"):
+
+with st.expander("Model Insights: Key Drivers"):
     # Access the 'xgb' step from your pipeline
     model_step = loaded_model.named_steps['xgb']
     
@@ -200,5 +201,4 @@ def suggest_price(model, dublin_aggregated_df):
 suggested_price = suggest_price(loaded_model, dublin_aggregated_df)
 if suggested_price:
     st.success(f"### Suggested price: €{suggested_price}")
-#st.write(f"Suggested price: GBP {suggested_price}")
 
