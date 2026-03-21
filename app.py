@@ -97,6 +97,26 @@ with tab2:
         longitude='longitude',
         use_container_width=True
     )
+with st.expander("Model Insights: Feature Importance"):
+    if hasattr(loaded_model, 'feature_importances_'):
+        # List features in the exact order the model expects them
+        feature_names = [
+            'host_id', 'host_response_rate', 'host_is_superhost', 
+            'host_listings_count', 'accommodates', 'bathrooms', 
+            'bedrooms', 'beds', 'avg_rating', 'number_of_reviews', 
+            'neighbourhood_freq', 'property_type_freq'
+        ]
+        
+        # Create a DataFrame and sort for better visualization
+        importances = pd.DataFrame({
+            'Feature': feature_names,
+            'Importance': loaded_model.feature_importances_
+        }).sort_values(by='Importance', ascending=True)
+
+        # Plot using Streamlit's native bar chart
+        st.bar_chart(importances.set_index('Feature'))
+    else:
+        st.info("Feature importance data is not available for this model.")
 
 # Optimize the suggest_price function
 @st.cache_data
