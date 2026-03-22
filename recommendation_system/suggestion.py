@@ -91,10 +91,10 @@ def recommend_airbnbs(user_id, listings_df, final_model):
                 st.markdown(f"🖼️ [View Full Image and Airbnb Listing]({listing['listing_url']})")
 
                     # Display image
-                    response = requests.get(listing['picture_url'])
-                    img = Image.open(BytesIO(response.content))
-                    st.image(img, use_column_width=True)
-                    st.markdown(f"[Open Airbnb Listing]({listing['listing_url']})")
+                    #response = requests.get(listing['picture_url'])
+                    #img = Image.open(BytesIO(response.content))
+                    #st.image(img, use_column_width=True)
+                    #st.markdown(f"[Open Airbnb Listing]({listing['listing_url']})")
 
             with col2:
                 try:
