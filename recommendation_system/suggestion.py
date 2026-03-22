@@ -108,6 +108,11 @@ def recommend_airbnbs(user_id, listings_df, final_model):
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
 
+# In your main() function
+st.sidebar.subheader("Test IDs")
+top_ids = raw_df['reviewer_id'].value_counts().head(5).index.tolist()
+st.sidebar.write("Try these frequent users:")
+st.sidebar.code(f"{top_ids}")
 
 def main():
     # Create a container for the input section
