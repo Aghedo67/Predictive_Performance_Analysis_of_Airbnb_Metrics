@@ -86,7 +86,10 @@ def recommend_airbnbs(user_id, listings_df, final_model):
                 """)
 
                 # Add "View Listing" button
-                if st.button(f"View Listing #{idx}", key=f"btn_{idx}"):
+                #if st.button(f"View Listing #{idx}", key=f"btn_{idx}"):
+                # Replace your 'if st.button' block with this:
+                st.markdown(f"🖼️ [View Full Image and Airbnb Listing]({listing['listing_url']})")
+
                     # Display image
                     response = requests.get(listing['picture_url'])
                     img = Image.open(BytesIO(response.content))
