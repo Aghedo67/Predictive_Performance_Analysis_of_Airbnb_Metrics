@@ -89,6 +89,11 @@ def recommend_airbnbs(user_id, listings_df, final_model):
                 #if st.button(f"View Listing #{idx}", key=f"btn_{idx}"):
                 # Replace your 'if st.button' block with this:
                 st.markdown(f"🖼️ [View Full Image and Airbnb Listing]({listing['listing_url']})")
+                with st.expander(f"View Listing Details for #{idx}"):
+                # This code stays visible even if the script reruns
+                st.image(listing['picture_url'], use_container_width=True)
+                 st.markdown(f"[Go to Airbnb Website]({listing['listing_url']})")
+
 
                     # Display image
                     #response = requests.get(listing['picture_url'])
