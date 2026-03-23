@@ -28,8 +28,8 @@ def load_model():
 
 # Initialize the app
 st.set_page_config(page_title="Airbnb suggestion", layout="wide")
-st.title("Airbnb Suggestion System App")
-st.info("This app builds an Airbnb Suggestion System")
+st.title("Airbnb Price Prediction System App")
+st.info("This app builds an Airbnb Price Prediction System")
 
 # Load data and model using cached functions
 loaded_model = load_model()
@@ -200,5 +200,5 @@ def suggest_price(model, dublin_aggregated_df):
 
 suggested_price = suggest_price(loaded_model, dublin_aggregated_df)
 if suggested_price:
-    st.success(f"### Suggested price: €{suggested_price}")
+    st.success(f"### Predicted price: €{suggested_price}")
 
