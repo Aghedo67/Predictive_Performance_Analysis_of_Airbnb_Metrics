@@ -27,8 +27,8 @@ def load_suggestion_model():
     return joblib.load('svd_final_model.pkl')
 
 # Initialize the app
-st.title("Airbnb Suggestion System")
-st.info("Get personalized Airbnb suggestions based on your user profile")
+st.title("Guest Personalized Listing System")
+st.info("Get personalized Airbnb Listing suggestions based on your user profile")
 
 # Load data and model
 final_model = load_suggestion_model()
