@@ -28,7 +28,7 @@ def load_suggestion_model():
 
 # Initialize the app
 st.title("Guest Personalized Listing System")
-st.info("Get personalized Airbnb Listing suggestions based on your user profile")
+st.info("Get personalized Airbnb listing suggestions based on your user profile")
 
 # Load data and model
 final_model = load_suggestion_model()
