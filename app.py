@@ -16,15 +16,15 @@ import matplotlib.pyplot as plt
 # Add caching for data loading
 @st.cache_data
 def load_data():
-    dublin_aggregated_df = pd.read_csv("dublin_aggregated_df.csv")
+    dublin_aggregated_df(1) = pd.read_csv("dublin_aggregated_df.csv")
     raw_df = pd.read_csv('dublin_merged_df.csv.gz', compression='gzip')
     raw_df['date'] = pd.to_datetime(raw_df['date'])
     raw_df['month'] = raw_df['date'].dt.month
-    return dublin_aggregated_df, raw_df
+    return dublin_aggregated_df(1), raw_df
 
 @st.cache_resource
 def load_model():
-    return joblib.load('xgb_model_log.pkl')
+    return joblib.load('xgb_model_log(1).pkl')
 
 # Initialize the app
 st.set_page_config(page_title="Airbnb suggestion", layout="wide")
@@ -33,7 +33,7 @@ st.info("This app builds an Airbnb Price Prediction System")
 
 # Load data and model using cached functions
 loaded_model = load_model()
-dublin_aggregated_df, raw_df = load_data()
+dublin_aggregated_df(1), raw_df = load_data()
 
 # Create tabs for better organization and performance
 tab1, tab2 = st.tabs(["Data & Predictions", "Visualizations"])
@@ -42,7 +42,7 @@ with tab1:
     # Data expander
     with st.expander('Data'):
         st.write('Raw data')
-        st.dataframe(dublin_aggregated_df)  # Using st.dataframe instead of st.write for better performance
+        st.dataframe(dublin_aggregated_df(1))  # Using st.dataframe instead of st.write for better performance
 
 with tab2:
     # Visualizations expander
@@ -51,9 +51,9 @@ with tab2:
     with col1:
         st.write('**Price v. Average Rating**')
         st.scatter_chart(
-            data=dublin_aggregated_df,
+            data=dublin_aggregated_df(1),
             x='price',
-            y='avg_rating',
+            y='review_scores_rating',
             color='#ffaa0088'
         )
 
@@ -76,7 +76,7 @@ with tab2:
     with col2:
         st.write('**Price Distribution**')
         fig, ax = plt.subplots(figsize=(8,6))
-        ax.hist(data=dublin_aggregated_df, x='price', bins=20, color='lightblue', edgecolor='black')
+        ax.hist(data=dublin_aggregated_df(1), x='price', bins=20, color='lightblue', edgecolor='black')
         st.pyplot(fig)
 
         st.write('**Monthly Price Distribution**')
@@ -104,9 +104,10 @@ with st.expander("Model Insights: Key Drivers"):
     
     if hasattr(model_step, 'feature_importances_'):
         feature_names = [
-            'host_id', 'host_response_rate', 'host_is_superhost', 
+            'host_response_rate', 'host_is_superhost', 
             'host_listings_count', 'accommodates', 'bathrooms', 
-            'bedrooms', 'beds', 'avg_rating', 'number_of_reviews', 
+            'bedrooms', 'beds', 'review_scores_rating', 'number_of_reviews',
+            'review_scores_cleanliness', 'review_scores_location', 'maximum_nights'
             'neighbourhood_freq', 'property_type_freq'
         ]
         
@@ -133,7 +134,7 @@ def calculate_frequency_encodings(neighbourhood, property_type, df):
     return neighbourhood_freq, property_freq
 
 
-def suggest_price(model, dublin_aggregated_df):
+def suggest_price(model, dublin_aggregated_df(1)):
     with st.sidebar:
         st.header('Property Details')
 
@@ -156,6 +157,7 @@ def suggest_price(model, dublin_aggregated_df):
             bathrooms = st.number_input("Bathrooms:", 0.0, 10.0, 1.0)
             bedrooms = st.number_input("Bedrooms:", 0.0, 10.0, 1.0)
             beds = st.number_input("Beds:", 1, 20, 1)
+            maximum_nights = st.number_input("Maximum Nights:", 1, 1125, 30)
 
         # Location and Ratings
         neighbourhood = st.selectbox("Neighbourhood:", dublin_aggregated_df['neighbourhood'].unique())
@@ -176,7 +178,6 @@ def suggest_price(model, dublin_aggregated_df):
 
                 # Create prediction DataFrame
                 property_details = pd.DataFrame({
-                    'host_id': [host_id],
                     'host_response_rate': [host_response_rate],
                     'host_is_superhost': [1 if host_is_superhost.lower() == 'yes' else 0],
                     'host_listings_count': [host_listings_count],
@@ -184,7 +185,11 @@ def suggest_price(model, dublin_aggregated_df):
                     'bathrooms': [bathrooms],
                     'bedrooms': [bedrooms],
                     'beds': [beds],
-                    'avg_rating': [avg_rating],
+                    'maximum_nights': [maximum_nights],
+                    'review_scores_rating': [review_scores_rating],
+                    'review_scores_cleanliness': [review_scores_cleanliness],
+                    'review_scores_location': [review_scores_cleanliness],
+                    'review_scores_rating': [review_scores_rating],
                     'number_of_reviews': [number_of_reviews],
                     'neighbourhood_freq': [neighbourhood_freq],
                     'property_type_freq': [property_freq]
