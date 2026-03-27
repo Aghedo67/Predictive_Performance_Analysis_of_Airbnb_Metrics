@@ -24,7 +24,7 @@ def load_data():
 
 @st.cache_resource
 def load_model():
-    return joblib.load('xgb_model_log.pkl')
+    return joblib.load('xgb_model_log(1).pkl')
 
 # Initialize the app
 st.set_page_config(page_title="Airbnb suggestion", layout="wide")
@@ -105,7 +105,7 @@ with st.expander("Model Insights: Key Drivers"):
     if hasattr(model_step, 'feature_importances_'):
         feature_names = [
             'host_response_rate', 'host_is_superhost', 
-            'host_listings_count', 'accommodates', 'bathrooms', 
+            'host_listings_count', 'accommodates', 
             'bedrooms', 'beds', 'review_scores_rating', 'number_of_reviews',
             'review_scores_cleanliness', 'review_scores_location', 'maximum_nights'
             'neighbourhood_freq', 'property_type_freq'
@@ -154,14 +154,13 @@ def suggest_price(model, dublin_aggregated_df):
             st.subheader("Property Info")
             property_type = st.selectbox("Type:", dublin_aggregated_df['property_type'].unique())
             accommodates = st.number_input("Accommodates:", 1, 20, 2)
-            bathrooms = st.number_input("Bathrooms:", 0.0, 10.0, 1.0)
+            #bathrooms = st.number_input("Bathrooms:", 0.0, 10.0, 1.0)
             bedrooms = st.number_input("Bedrooms:", 0.0, 10.0, 1.0)
             beds = st.number_input("Beds:", 1, 20, 1)
             maximum_nights = st.number_input("Maximum Nights:", 1, 1125, 30)
 
         # Location and Ratings
         neighbourhood = st.selectbox("Neighbourhood:", dublin_aggregated_df['neighbourhood'].unique())
-        
         review_scores_rating = st.number_input("Average Rating:", 0.0, 5.0, 4.5)
         review_scores_cleanliness = st.number_input("Cleanliness Rating:", 0.0, 5.0, 4.5)
         review_scores_location = st.number_input("Location Rating:", 0.0, 5.0, 4.5)
@@ -187,7 +186,7 @@ def suggest_price(model, dublin_aggregated_df):
                     'host_is_superhost': [1 if host_is_superhost.lower() == 'yes' else 0],
                     'host_listings_count': [host_listings_count],
                     'accommodates': [accommodates],
-                    'bathrooms': [bathrooms],
+                    #'bathrooms': [bathrooms],
                     'bedrooms': [bedrooms],
                     'beds': [beds],
                     'maximum_nights': [maximum_nights],
