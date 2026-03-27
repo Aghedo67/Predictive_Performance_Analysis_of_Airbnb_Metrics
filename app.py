@@ -188,7 +188,7 @@ def suggest_price(model, dublin_aggregated_df):
                     'maximum_nights': [maximum_nights],
                     'review_scores_rating': [review_scores_rating],
                     'review_scores_cleanliness': [review_scores_cleanliness],
-                    'review_scores_location': [review_scores_cleanliness],
+                    'review_scores_location': [review_scores_location],
                     'review_scores_rating': [review_scores_rating],
                     'number_of_reviews': [number_of_reviews],
                     'neighbourhood_freq': [neighbourhood_freq],
