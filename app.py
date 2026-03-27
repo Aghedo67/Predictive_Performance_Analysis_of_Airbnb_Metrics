@@ -13,6 +13,197 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
+import streamlit as st
+import joblib
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# -------------------- LOAD DATA --------------------
+@st.cache_data
+def load_data():
+    dublin_aggregated_df = pd.read_csv("dublin_aggregated_df(1).csv")
+    raw_df = pd.read_csv('dublin_merged_df(1).csv.gz', compression='gzip')
+    raw_df['date'] = pd.to_datetime(raw_df['date'])
+    raw_df['month'] = raw_df['date'].dt.month
+    return dublin_aggregated_df, raw_df
+
+@st.cache_resource
+def load_model():
+    return joblib.load('xgb_model_log(1).pkl')
+
+# -------------------- APP SETUP --------------------
+st.set_page_config(page_title="Airbnb suggestion", layout="wide")
+st.title("Airbnb Price Prediction System App")
+st.info("This app builds an Airbnb Price Prediction System")
+
+loaded_model = load_model()
+dublin_aggregated_df, raw_df = load_data()
+
+# -------------------- TABS --------------------
+tab1, tab2 = st.tabs(["Data & Predictions", "Visualizations"])
+
+# -------------------- TAB 1 --------------------
+with tab1:
+    with st.expander('Data'):
+        st.dataframe(dublin_aggregated_df)
+
+# -------------------- TAB 2 --------------------
+with tab2:
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.write('**Price vs Average Rating**')
+        st.scatter_chart(
+            data=dublin_aggregated_df,
+            x='price',
+            y='review_scores_rating'
+        )
+
+        @st.cache_data
+        def get_property_type_data():
+            property_counts = raw_df['property_type'].value_counts()
+            top_types = property_counts.nlargest(10).index
+            return (
+                raw_df[raw_df['property_type'].isin(top_types)]
+                .groupby('property_type')['price']
+                .mean()
+                .reset_index()
+                .sort_values(by='price', ascending=False)
+            )
+
+        st.write('**Top Property Types by Price**')
+        st.bar_chart(get_property_type_data(), x='property_type', y='price')
+
+    with col2:
+        st.write('**Price Distribution**')
+        fig, ax = plt.subplots()
+        ax.hist(dublin_aggregated_df['price'], bins=20)
+        st.pyplot(fig)
+
+        @st.cache_data
+        def get_monthly_price():
+            return raw_df.groupby('month')['price'].mean().reset_index()
+
+        st.write('**Monthly Price Trend**')
+        st.line_chart(get_monthly_price(), x='month', y='price')
+
+    st.write('**Map View**')
+    st.map(raw_df.sample(1000), latitude='latitude', longitude='longitude', width='stretch')
+
+# -------------------- MODEL INSIGHTS --------------------
+with st.expander("Model Insights"):
+    if hasattr(loaded_model, "named_steps"):
+        model_step = loaded_model.named_steps.get('xgb', None)
+    else:
+        model_step = loaded_model
+
+    if hasattr(model_step, 'feature_importances_'):
+        feature_names = [
+            'host_response_rate', 'host_is_superhost',
+            'host_listings_count', 'accommodates',
+            'bedrooms', 'beds',
+            'review_scores_rating', 'number_of_reviews',
+            'review_scores_cleanliness', 'review_scores_location',
+            'maximum_nights',
+            'neighbourhood_freq', 'property_type_freq'
+        ]
+
+        fi = pd.DataFrame({
+            "Feature": feature_names,
+            "Importance": model_step.feature_importances_
+        }).sort_values(by="Importance", ascending=True)
+
+        st.bar_chart(fi.set_index("Feature"))
+    else:
+        st.warning("Feature importance not available.")
+
+# -------------------- ENCODING --------------------
+@st.cache_data
+def calculate_frequency_encodings(neighbourhood, property_type, df):
+    neighbourhood_freq = df[df['neighbourhood'] == neighbourhood]['neighbourhood_freq'].mean()
+    property_freq = df[df['property_type'] == property_type]['property_type_freq'].mean()
+
+    # Handle missing
+    if pd.isna(neighbourhood_freq):
+        neighbourhood_freq = df['neighbourhood_freq'].mean()
+
+    if pd.isna(property_freq):
+        property_freq = df['property_type_freq'].mean()
+
+    return neighbourhood_freq, property_freq
+
+# -------------------- PREDICTION --------------------
+def suggest_price(model, df):
+    with st.sidebar:
+        st.header('Property Details')
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            host_response_rate = st.number_input("Response rate", 0.0, 1.0, 0.9)
+            host_is_superhost = st.radio("Superhost", ["yes", "no"])
+            host_listings_count = st.number_input("Listings count", min_value=1, value=1)
+
+        with col2:
+            property_type = st.selectbox("Property Type", df['property_type'].dropna().unique())
+            accommodates = st.number_input("Accommodates", 1, 20, 2)
+            bedrooms = st.number_input("Bedrooms", 0.0, 10.0, 1.0)
+            beds = st.number_input("Beds", 1, 20, 1)
+            maximum_nights = st.number_input("Max Nights", 1, 1125, 30)
+
+        neighbourhood = st.selectbox("Neighbourhood", df['neighbourhood'].dropna().unique())
+        review_scores_rating = st.number_input("Rating", 0.0, 5.0, 4.5)
+        review_scores_cleanliness = st.number_input("Cleanliness", 0.0, 5.0, 4.5)
+        review_scores_location = st.number_input("Location Score", 0.0, 5.0, 4.5)
+        number_of_reviews = st.number_input("Reviews", 0, 500000, 10)
+
+        if st.button("Predict Price"):
+
+            neighbourhood_freq, property_freq = calculate_frequency_encodings(
+                neighbourhood, property_type, df
+            )
+
+            input_df = pd.DataFrame([{
+                'host_response_rate': host_response_rate,
+                'host_is_superhost': 1 if host_is_superhost == 'yes' else 0,
+                'host_listings_count': host_listings_count,
+                'accommodates': accommodates,
+                'bedrooms': bedrooms,
+                'beds': beds,
+                'maximum_nights': maximum_nights,
+                'review_scores_rating': review_scores_rating,
+                'review_scores_cleanliness': review_scores_cleanliness,
+                'review_scores_location': review_scores_location,
+                'number_of_reviews': number_of_reviews,
+                'neighbourhood_freq': neighbourhood_freq,
+                'property_type_freq': property_freq
+            }])
+
+            # Ensure correct order if available
+            try:
+                input_df = input_df[model.feature_names_in_]
+            except:
+                pass
+
+            try:
+                pred_log = model.predict(input_df)
+                price = np.exp(pred_log[0])
+                return round(price, 2)
+            except Exception as e:
+                st.error(f"Prediction error: {e}")
+                return None
+
+    return None
+
+# -------------------- RUN --------------------
+price = suggest_price(loaded_model, dublin_aggregated_df)
+
+if price is not None:
+    st.success(f"### Predicted Price: €{price}")
+
+'''
 # Add caching for data loading
 @st.cache_data
 def load_data():
@@ -209,4 +400,4 @@ def suggest_price(model, dublin_aggregated_df_1):
 suggested_price = suggest_price(loaded_model, dublin_aggregated_df_1)
 if suggested_price:
     st.success(f"### Predicted price: €{suggested_price}")
-
+'''
