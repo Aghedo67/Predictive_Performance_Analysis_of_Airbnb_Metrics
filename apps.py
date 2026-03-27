@@ -94,7 +94,9 @@ with tab2:
         ax.hist(df['price'], bins=20)
         st.pyplot(fig)
 
-        monthly = raw_df.groupby('month')['price'].mean().reset_index()
+        #monthly = raw_df.groupby('month')['price'].mean().reset_index()
+        # Convert month number to name
+        monthly['month'] = pd.to_datetime(monthly['month'], format='%m').dt.strftime('%B')
         st.subheader("Monthly Trends")
         st.line_chart(monthly, x='month', y='price')
 
