@@ -20,7 +20,7 @@ def load_data():
     raw_df = pd.read_csv('dublin_merged_df(1).csv.gz', compression='gzip')
     raw_df['date'] = pd.to_datetime(raw_df['date'])
     raw_df['month'] = raw_df['date'].dt.month
-    return dublin_aggregated_df, raw_df
+    return dublin_aggregated_df_1, raw_df
 
 @st.cache_resource
 def load_model():
