@@ -161,6 +161,7 @@ def suggest_price(model, dublin_aggregated_df):
 
         # Location and Ratings
         neighbourhood = st.selectbox("Neighbourhood:", dublin_aggregated_df['neighbourhood'].unique())
+        
         review_scores_rating = st.number_input("Average Rating:", 0.0, 5.0, 4.5)
         review_scores_cleanliness = st.number_input("Cleanliness Rating:", 0.0, 5.0, 4.5)
         review_scores_location = st.number_input("Location Rating:", 0.0, 5.0, 4.5)
