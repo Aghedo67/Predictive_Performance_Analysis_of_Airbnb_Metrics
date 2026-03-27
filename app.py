@@ -20,7 +20,7 @@ def load_data():
     raw_df = pd.read_csv('dublin_merged_df(1).csv.gz', compression='gzip')
     raw_df['date'] = pd.to_datetime(raw_df['date'])
     raw_df['month'] = raw_df['date'].dt.month
-    return dublin_aggregated_df(1), raw_df
+    return dublin_aggregated_df, raw_df
 
 @st.cache_resource
 def load_model():
@@ -33,7 +33,7 @@ st.info("This app builds an Airbnb Price Prediction System")
 
 # Load data and model using cached functions
 loaded_model = load_model()
-dublin_aggregated_df(1), raw_df = load_data()
+dublin_aggregated_df, raw_df = load_data()
 
 # Create tabs for better organization and performance
 tab1, tab2 = st.tabs(["Data & Predictions", "Visualizations"])
@@ -42,7 +42,7 @@ with tab1:
     # Data expander
     with st.expander('Data'):
         st.write('Raw data')
-        st.dataframe(dublin_aggregated_df(1))  # Using st.dataframe instead of st.write for better performance
+        st.dataframe(dublin_aggregated_df)  # Using st.dataframe instead of st.write for better performance
 
 with tab2:
     # Visualizations expander
@@ -51,7 +51,7 @@ with tab2:
     with col1:
         st.write('**Price v. Average Rating**')
         st.scatter_chart(
-            data=dublin_aggregated_df(1),
+            data=dublin_aggregated_df,
             x='price',
             y='review_scores_rating',
             color='#ffaa0088'
@@ -76,7 +76,7 @@ with tab2:
     with col2:
         st.write('**Price Distribution**')
         fig, ax = plt.subplots(figsize=(8,6))
-        ax.hist(data=dublin_aggregated_df(1), x='price', bins=20, color='lightblue', edgecolor='black')
+        ax.hist(data=dublin_aggregated_df, x='price', bins=20, color='lightblue', edgecolor='black')
         st.pyplot(fig)
 
         st.write('**Monthly Price Distribution**')
@@ -134,7 +134,7 @@ def calculate_frequency_encodings(neighbourhood, property_type, df):
     return neighbourhood_freq, property_freq
 
 
-def suggest_price(model, dublin_aggregated_df(1)):
+def suggest_price(model, dublin_aggregated_df):
     with st.sidebar:
         st.header('Property Details')
 
@@ -152,7 +152,7 @@ def suggest_price(model, dublin_aggregated_df(1)):
         with col2:
             # Property Details
             st.subheader("Property Info")
-            property_type = st.selectbox("Type:", dublin_aggregated_df(1)['property_type'].unique())
+            property_type = st.selectbox("Type:", dublin_aggregated_df['property_type'].unique())
             accommodates = st.number_input("Accommodates:", 1, 20, 2)
             bathrooms = st.number_input("Bathrooms:", 0.0, 10.0, 1.0)
             bedrooms = st.number_input("Bedrooms:", 0.0, 10.0, 1.0)
@@ -160,14 +160,14 @@ def suggest_price(model, dublin_aggregated_df(1)):
             maximum_nights = st.number_input("Maximum Nights:", 1, 1125, 30)
 
         # Location and Ratings
-        neighbourhood = st.selectbox("Neighbourhood:", dublin_aggregated_df(1)['neighbourhood'].unique())
+        neighbourhood = st.selectbox("Neighbourhood:", dublin_aggregated_df['neighbourhood'].unique())
         review_scores_rating = st.number_input("Rating:", 0.0, 5.0, 4.5)
         number_of_reviews = st.number_input("Reviews:", 0, 500000, 10)
 
         if st.button("Calculate Price"):
             # Validate and calculate
-            if neighbourhood in dublin_aggregated_df(1)['neighbourhood'].values and \
-               property_type in dublin_aggregated_df(1)['property_type'].values:
+            if neighbourhood in dublin_aggregated_df['neighbourhood'].values and \
+               property_type in dublin_aggregated_df['property_type'].values:
 
                 # Get frequency encodings
                 neighbourhood_freq, property_freq = calculate_frequency_encodings(
@@ -203,7 +203,7 @@ def suggest_price(model, dublin_aggregated_df(1)):
                 st.error("Invalid neighbourhood or property type")
                 return None
 
-suggested_price = suggest_price(loaded_model, dublin_aggregated_df(1))
+suggested_price = suggest_price(loaded_model, dublin_aggregated_df)
 if suggested_price:
     st.success(f"### Predicted price: €{suggested_price}")
 
