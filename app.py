@@ -162,9 +162,11 @@ def suggest_price(model, dublin_aggregated_df):
         # Location and Ratings
         neighbourhood = st.selectbox("Neighbourhood:", dublin_aggregated_df['neighbourhood'].unique())
         review_scores_rating = st.number_input("Average Rating:", 0.0, 5.0, 4.5)
-        number_of_reviews = st.number_input("Reviews:", 0, 500000, 10)
-        review_scores_location = st.number_input("Location Rating:", 0.0, 5.0, 4.5)
         review_scores_cleanliness = st.number_input("Cleanliness Rating:", 0.0, 5.0, 4.5)
+        review_scores_location = st.number_input("Location Rating:", 0.0, 5.0, 4.5)
+        number_of_reviews = st.number_input("Reviews:", 0, 500000, 10)
+        
+        
 
         if st.button("Calculate Price"):
             # Validate and calculate
@@ -189,8 +191,8 @@ def suggest_price(model, dublin_aggregated_df):
                     'beds': [beds],
                     'maximum_nights': [maximum_nights],
                     'review_scores_rating': [review_scores_rating],
-                    'review_scores_location': [review_scores_location],
                     'review_scores_cleanliness': [review_scores_cleanliness],
+                    'review_scores_location': [review_scores_location],
                     'number_of_reviews': [number_of_reviews],
                     'neighbourhood_freq': [neighbourhood_freq],
                     'property_type_freq': [property_freq]
