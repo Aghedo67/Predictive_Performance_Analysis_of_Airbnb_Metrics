@@ -202,4 +202,3 @@ if price is not None:
 suggested_price = suggest_price(loaded_model, dublin_aggregated_df_1)
 if suggested_price:
     st.success(f"### Predicted price: €{suggested_price}")
-'''
