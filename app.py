@@ -177,7 +177,7 @@ def suggest_price(model, dublin_aggregated_df_1):
                 neighbourhood_freq, property_freq = calculate_frequency_encodings(
                     neighbourhood,
                     property_type,
-                    dublin_aggregated_df
+                    dublin_aggregated_df_1
                 )
 
                 # Create prediction DataFrame
