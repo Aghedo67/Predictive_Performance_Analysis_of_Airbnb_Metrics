@@ -42,7 +42,7 @@ with tab1:
     # Data expander
     with st.expander('Data'):
         st.write('Raw data')
-        st.dataframe(dublin_aggregated_df (1))  # Using st.dataframe instead of st.write for better performance
+        st.dataframe(dublin_aggregated_df(1))  # Using st.dataframe instead of st.write for better performance
 
 with tab2:
     # Visualizations expander
@@ -134,7 +134,7 @@ def calculate_frequency_encodings(neighbourhood, property_type, df):
     return neighbourhood_freq, property_freq
 
 
-def suggest_price(model, dublin_aggregated_df (1)):
+def suggest_price(model, dublin_aggregated_df(1)):
     with st.sidebar:
         st.header('Property Details')
 
