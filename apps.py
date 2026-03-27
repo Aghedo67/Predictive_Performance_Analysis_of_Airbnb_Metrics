@@ -66,7 +66,7 @@ col2.metric("⭐ Avg Rating", round(df['review_scores_rating'].mean(), 2))
 col3.metric("🏘️ Listings", len(df))
 
 # -------------------- TABS --------------------
-tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "📈 Visual Insights", "🤖 Prediction"])
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "📈 Visual Insights", "🧠 Model Insights", "🤖 Prediction"])
 
 # -------------------- TAB 1 --------------------
 with tab1:
@@ -113,9 +113,52 @@ def calculate_frequency_encodings(neighbourhood, property_type, df):
         p_freq = df['property_type_freq'].mean()
 
     return n_freq, p_freq
-
-# -------------------- TAB 3 --------------------
+## -------------------- TAB 3 --------------------
 with tab3:
+    st.subheader("Feature Importance (XGBoost Model)")
+
+    # Extract model (handle pipeline case)
+    if hasattr(model, "named_steps"):
+        model_step = model.named_steps.get('xgb', model)
+    else:
+        model_step = model
+
+    if hasattr(model_step, 'feature_importances_'):
+
+        feature_names = [
+            'host_response_rate', 'host_is_superhost',
+            'host_listings_count', 'accommodates',
+            'bedrooms', 'beds',
+            'review_scores_rating', 'number_of_reviews',
+            'review_scores_cleanliness', 'review_scores_location',
+            'maximum_nights',
+            'neighbourhood_freq', 'property_type_freq'
+        ]
+
+        fi = pd.DataFrame({
+            "Feature": feature_names,
+            "Importance": model_step.feature_importances_
+        }).sort_values(by="Importance", ascending=True)
+
+        # 🔥 Fancy horizontal bar chart
+        st.markdown("### 📊 Feature Importance Ranking")
+
+        fig, ax = plt.subplots()
+        ax.barh(fi["Feature"], fi["Importance"])
+        ax.set_xlabel("Importance")
+        ax.set_title("Top Features Driving Airbnb Prices")
+
+        st.pyplot(fig)
+
+        # Optional: display table
+        with st.expander("📄 View Raw Importance Values"):
+            st.dataframe(fi)
+
+    else:
+        st.warning("Feature importance not available for this model.")
+
+# -------------------- TAB 4 --------------------
+with tab4:
     st.subheader("Enter Property Details")
 
     col1, col2 = st.columns(2)
