@@ -195,7 +195,3 @@ price = suggest_price(loaded_model, dublin_aggregated_df)
 
 if price is not None:
     st.success(f"### Predicted Price: €{price}")
-            else:
-                st.error("Invalid neighbourhood or property type")
-                return None
-
