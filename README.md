@@ -4,12 +4,14 @@ Dissertation
 The aim of this project is to predict an Airbnb price predictive model and to also buld a recommendation system
 That would help property owners in looking to invest in the shortlet business via the Airbnb platform.
 # Methodology
-Our approach combined two methodologies—Regression Models and Collaborative Filtering
+Our approach combined two methodologies
+Regression Models and Collaborative Filtering
  
  ## Price Prediction Models
-<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/1595d915-533c-451f-b5e1-f722436afdf8" />
+<img width="1389" height="589" alt="image" src="https://github.com/user-attachments/assets/2ab27a2f-1985-4231-9467-34b74874fb17" />
 
-<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/62a8d680-b762-4700-a889-2d5af6774fae" />
+<img width="1390" height="590" alt="image" src="https://github.com/user-attachments/assets/2076f988-4861-47d8-aaa5-ea3d13e92356" />
+
 
 ## Train vs Test Performance
 Key observations
@@ -43,7 +45,8 @@ Predictions closely follow the actual values, though slight deviations exist for
 The model based approached was used for this recommendation system, where algorithm such as BaselineOnly, SlopeOne and SVD
 was experimented on. With SVD out performing the rest algorithms with an RMSE of 0.4097.
 
-<img width="1390" height="590" alt="image" src="https://github.com/user-attachments/assets/f96a0402-31ce-46ba-8d06-10f31e3aafe8" />
+<img width="1390" height="490" alt="image" src="https://github.com/user-attachments/assets/97288fb6-86f8-4cb5-8e18-dd11913cb348" />
+
 
 ## Conclusion
 This study demonstrates that ensemble learning methods, particularly XGBoost, significantly improve Airbnb price prediction accuracy, providing a reliable tool for pricing strategy and decision-making.
