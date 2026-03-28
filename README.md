@@ -47,7 +47,7 @@ Although Random Forest achieved very low training error, the large gap indicates
 
 Predictions closely follow the actual values, though slight deviations exist for high-priced listings
 
-<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/a8da2446-5590-4367-9925-8c1fea564b50" />
+<img width="790" height="590" alt="image" src="https://github.com/user-attachments/assets/586d541b-7c65-4279-866f-ffccdb17dfbb" />
 
 
 ## Colaborative Filtering model
