@@ -50,5 +50,5 @@ This study demonstrates that ensemble learning methods, particularly XGBoost, si
 
 # Dashboard
 Here is a link to a User Friendly interface for Airbnb Price suggestion / recommender System:
-https://predictiveperformanceanalysisofairbnbmetrics-ngqume5xlwkuulbkq.streamlit.app/ (Price)
+https://predictiveperformanceanalysisofairbnbmetrics-4asnlpyjsjc42588x.streamlit.app/ (Price)
 https://predictiveperformanceanalysisofairbnbmetrics-8bysfmucc3l2hpevc.streamlit.app/ (Recommendation System)
