@@ -42,8 +42,7 @@ Predictions closely follow the actual values, though slight deviations exist for
 
 
 ## Colaborative Filtering model
-The model based approached was used for this recommendation system, where algorithm such as BaselineOnly, SlopeOne and SVD
-was experimented on. With SVD out performing the rest algorithms with an RMSE of 0.4097.
+Both BaselineOnly and SVD has almost similar RMSE and MAE, but BaselineOnly had shorter computation time. In Data science if the benchmark model and complex model have similar result, it is best to choose the baseline model and in this case it is the BaselineOnly. This models was trained using the two rating scales review_scores_rating (1, 5) and compound_scores (-1, 1)This visually confirms that predicting sentiment is much harder for both model than predicting stars in the data set.
 
 <img width="1390" height="490" alt="image" src="https://github.com/user-attachments/assets/97288fb6-86f8-4cb5-8e18-dd11913cb348" />
 
