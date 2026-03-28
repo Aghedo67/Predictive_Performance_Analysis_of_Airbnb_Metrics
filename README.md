@@ -41,7 +41,8 @@ Smaller gap than RF → Better regularisation
 
 Although Random Forest achieved very low training error, the large gap indicates overfitting. XGBoost provides a better bias-variance trade-off. XGBoost was selected as the final model because it achieved the lowest RMSE, highest R², and demonstrated strong generalisation with minimal overfitting.
 
-<img width="790" height="590" alt="image" src="https://github.com/user-attachments/assets/42536a55-b91b-47a2-bca0-5e8930c0315c" />
+<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/bd884631-793a-4af2-9c3c-5c7d3c12a351" />
+
 
 
 Predictions closely follow the actual values, though slight deviations exist for high-priced listings
