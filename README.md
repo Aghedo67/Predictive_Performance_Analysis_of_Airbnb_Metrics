@@ -48,7 +48,7 @@ Both BaselineOnly and SVD has almost similar RMSE and MAE, but BaselineOnly had 
 
 
 ## Conclusion
-This study demonstrates that ensemble learning methods, particularly XGBoost, significantly improve Airbnb price prediction accuracy, providing a reliable tool for pricing strategy and decision-making.
+This study demonstrates that ensemble learning methods, particularly XGBoost, significantly improve Airbnb price prediction accuracy, providing a reliable tool for pricing strategy and decision-making. One of the major limitation is that the model pocesses the inability to address new listings aand guest which means it has a cold start problem and finally the model is biased due to the skewness of the sentiment scores.
 
 # Dashboard
 Here is a link to a User Friendly interface for Airbnb Price suggestion / recommender System:
