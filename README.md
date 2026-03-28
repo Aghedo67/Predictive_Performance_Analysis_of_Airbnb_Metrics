@@ -4,6 +4,14 @@ Dissertation
 The aim of this project is to predict an Airbnb price predictive model and to also buld a recommendation system
 That would help property owners in looking to invest in the shortlet business via the Airbnb platform.
 # Methodology
+
+## Correlation Heatmap
+
+<img width="1989" height="1418" alt="image" src="https://github.com/user-attachments/assets/c922a9dc-1f35-4e89-94f1-137b44e507d9" />
+
+## Sentiment Analysis
+<img width="868" height="547" alt="image" src="https://github.com/user-attachments/assets/7d60228e-2b8f-4086-8010-e18325d8cc80" />
+
 Our approach combined two methodologies
 Regression Models and Collaborative Filtering
  
