@@ -52,7 +52,7 @@ Predictions closely follow the actual values, though slight deviations exist for
 ## Colaborative Filtering model
 Both BaselineOnly and SVD has almost similar RMSE and MAE, but BaselineOnly had shorter computation time. In Data science if the benchmark model and complex model have similar result, it is best to choose the baseline model and in this case it is the BaselineOnly. This models was trained using the two rating scales review_scores_rating (1, 5) and compound_scores (-1, 1)This visually confirms that predicting sentiment is much harder for both model than predicting stars in the data set.
 
-<img width="1390" height="490" alt="image" src="https://github.com/user-attachments/assets/97288fb6-86f8-4cb5-8e18-dd11913cb348" />
+<img width="1389" height="589" alt="image" src="https://github.com/user-attachments/assets/542ce379-80d1-4ea8-9dab-31e2f2384fdf" />
 
 
 ## Conclusion
