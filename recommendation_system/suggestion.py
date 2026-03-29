@@ -78,10 +78,10 @@ def recommend_airbnbs(user_id, listings_df, final_model):
 
                 with col2:
                     # Fancy Match Score (Scaling 1-5 stars to 0-100%)
-                    match_score = min(99, int((rec.est / 5) * 100))
+                    #match_score = min(99, int((rec.est / 5) * 100))
                     
-                    st.markdown(f"### {idx}. {listing['name']}")
-                    st.markdown(f"**Match Compatibility: `{match_score}%`**")
+                    #st.markdown(f"### {idx}. {listing['name']}")
+                    #st.markdown(f"**Match Compatibility: `{match_score}%`**")
                     
                     # Display metrics for quick scanning
                     m1, m2, m3 = st.columns(3)
