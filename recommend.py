@@ -53,7 +53,7 @@ def load_data():
 @st.cache_resource
 def load_models():
     price_model = joblib.load("xgb_model_log(1).pkl")
-    rec_model = joblib.load("svd_final_model.pkl")
+    rec_model = joblib.load("svd_model.pkl")
     return price_model, rec_model
 
 df, raw_df = load_data()
