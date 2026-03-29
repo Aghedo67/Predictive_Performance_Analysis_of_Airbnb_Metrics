@@ -1,3 +1,4 @@
+"""
 pandas
 scikit-learn
 xgboost
@@ -7,6 +8,16 @@ numpy==1.26.4
 streamlit>=1.35.0
 Pillow
 requests
-
+"""
+streamlit
+pandas
+numpy
+matplotlib
+scikit-learn
+xgboost
+surprise
+pillow
+requests
+joblib
 
 
