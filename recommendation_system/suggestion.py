@@ -7,7 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1UHYT1P4IJrL782h107DrSatkb1xUo7pC
 """
 
-
 import streamlit as st
 import joblib
 import pandas as pd
@@ -15,10 +14,10 @@ from PIL import Image
 import requests
 from io import BytesIO
 
-# 1. PAGE CONFIG: Must be the first Streamlit command
+# 1. PAGE CONFIG
 st.set_page_config(page_title="Dublin StaySelect", page_icon="🍀", layout="wide")
 
-# 2. CUSTOM CSS: Fixes the 'unsafe_allow_html' error and adds styling
+# 2. CUSTOM CSS
 st.markdown("""
     <style>
     .main { background-color: #f8f9fa; }
@@ -32,7 +31,6 @@ st.markdown("""
 # 3. DATA LOADING
 @st.cache_data
 def load_data():
-    # Ensure the file path is correct relative to your script
     return pd.read_csv('dublin_merged_df(1).csv.gz', compression='gzip')
 
 @st.cache_resource
@@ -72,12 +70,11 @@ def recommend_airbnbs(user_id, listings_df, final_model):
                 with col1:
                     img = get_image(listing['picture_url'])
                     if img:
-                        st.image(img, use_column_width=True)
+                        st.image(img, use_container_width=True)
                     else:
                         st.info("No Preview Image Available")
 
                 with col2:
-                    # Display metrics for quick scanning
                     m1, m2, m3 = st.columns(3)
                     m1.metric("Nightly Rate", f"€{listing['price']}")
                     m2.metric("Capacity", f"{int(listing['accommodates'])} Guests")
@@ -102,6 +99,16 @@ def main():
     with st.sidebar:
         st.title("🍀 DublinStay")
         st.markdown("---")
+        
+        # --- NEW MODEL PERFORMANCE SECTION ---
+        st.subheader("📊 Model Performance")
+        st.caption("BaselineOnly Algorithm")
+        col_m1, col_m2 = st.columns(2)
+        col_m1.metric("RMSE", "0.4347")
+        col_m2.metric("MAE", "0.3205")
+        st.info("Cross-validated on 5 splits.")
+        st.markdown("---")
+        
         st.subheader("Quick Test Profiles")
         top_ids = raw_df['reviewer_id'].value_counts().head(5).index.tolist()
         selected_id = st.selectbox("Choose a frequent reviewer:", top_ids)
