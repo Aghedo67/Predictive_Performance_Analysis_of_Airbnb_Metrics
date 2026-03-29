@@ -167,9 +167,9 @@ final_model = load_suggestion_model()
 raw_df = load_data()
 
 def recommend_airbnbs(user_id, listings_df, final_model):
-    """
+    
     #Suggest 5 personalized Dublin Airbnb listings using Streamlit
-    """
+    
     try:
         # Get listings already rated by the user
         user_listings = listings_df[listings_df['reviewer_id'] == user_id]['id_x'].unique()
