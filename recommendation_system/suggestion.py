@@ -15,21 +15,24 @@ from PIL import Image
 import requests
 from io import BytesIO
 
-# PAGE CONFIG: Set a custom theme and wide layout
+# 1. PAGE CONFIG: Must be the first Streamlit command
 st.set_page_config(page_title="Dublin StaySelect", page_icon="🍀", layout="wide")
 
-# Custom CSS for a "Premium" look
+# 2. CUSTOM CSS: Fixes the 'unsafe_allow_html' error and adds styling
 st.markdown("""
     <style>
     .main { background-color: #f8f9fa; }
-    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .rec-card { border: 1px solid #ddd; padding: 20px; border-radius: 15px; margin-bottom: 20px; background: white; }
-    .price-tag { color: #FF5A5F; font-size: 24px; font-weight: bold; }
+    div[data-testid="stMetricValue"] { color: #FF5A5F; }
+    .stButton>button { width: 100%; border-radius: 20px; height: 3em; background-color: #FF5A5F; color: white; border: none; }
+    .stButton>button:hover { background-color: #de3e44; color: white; }
+    .reportview-container .main .block-container { padding-top: 2rem; }
     </style>
-    """, unsafe_allow_headers=True)
+    """, unsafe_allow_html=True)
 
+# 3. DATA LOADING
 @st.cache_data
 def load_data():
+    # Ensure the file path is correct relative to your script
     return pd.read_csv('dublin_merged_df(1).csv.gz', compression='gzip')
 
 @st.cache_resource
@@ -40,78 +43,86 @@ def get_image(url):
     try:
         response = requests.get(url, timeout=5)
         return Image.open(BytesIO(response.content))
-    except:
+    except Exception:
         return None
 
+# 4. RECOMMENDATION LOGIC
 def recommend_airbnbs(user_id, listings_df, final_model):
-    all_listings = listings_df['id_x'].unique()
-    user_listings = listings_df[listings_df['reviewer_id'] == user_id]['id_x'].unique()
-    listings_to_predict = list(set(all_listings) - set(user_listings))
-    
-    # Predict
-    user_listing_pairs = [(user_id, lid, 0) for lid in listings_to_predict]
-    predictions = final_model.test(user_listing_pairs)
-    top_recs = sorted(predictions, key=lambda x: x.est, reverse=True)[:5]
-
-    st.subheader(f"✨ Handpicked for Guest #{user_id}")
-    
-    for idx, rec in enumerate(top_recs, 1):
-        listing = listings_df[listings_df['id_x'] == rec.iid].iloc[0]
+    try:
+        all_listings = listings_df['id_x'].unique()
+        user_listings = listings_df[listings_df['reviewer_id'] == user_id]['id_x'].unique()
+        listings_to_predict = list(set(all_listings) - set(user_listings))
         
-        # UI Container for each recommendation
-        with st.container():
-            col1, col2 = st.columns([1, 2])
+        # Predict ratings for unvisited listings
+        user_listing_pairs = [(user_id, lid, 0) for lid in listings_to_predict]
+        predictions = final_model.test(user_listing_pairs)
+        
+        # Sort by estimated rating and take top 5
+        top_recs = sorted(predictions, key=lambda x: x.est, reverse=True)[:5]
+
+        st.write("---")
+        st.subheader(f"✨ Top Matches for Guest {user_id}")
+        
+        for idx, rec in enumerate(top_recs, 1):
+            listing = listings_df[listings_df['id_x'] == rec.iid].iloc[0]
             
-            with col1:
-                img = get_image(listing['picture_url'])
-                if img:
-                    st.image(img, use_container_width=True, caption=f"Dublin, {listing['neighbourhood']}")
-                else:
-                    st.warning("No image available")
+            with st.container():
+                col1, col2 = st.columns([1, 2])
+                
+                with col1:
+                    img = get_image(listing['picture_url'])
+                    if img:
+                        st.image(img, use_container_width=True)
+                    else:
+                        st.info("No Preview Image Available")
 
-            with col2:
-                # Calculate a "Match Score" percentage for flair
-                match_pct = min(99, int((rec.est / 5) * 100)) 
+                with col2:
+                    # Fancy Match Score (Scaling 1-5 stars to 0-100%)
+                    match_score = min(99, int((rec.est / 5) * 100))
+                    
+                    st.markdown(f"### {idx}. {listing['name']}")
+                    st.markdown(f"**Match Compatibility: `{match_score}%`**")
+                    
+                    # Display metrics for quick scanning
+                    m1, m2, m3 = st.columns(3)
+                    m1.metric("Nightly Rate", f"€{listing['price']}")
+                    m2.metric("Capacity", f"{int(listing['accommodates'])} Guests")
+                    m3.metric("Beds", f"{int(listing['bedrooms'])}")
+                    
+                    with st.expander("Explore Property Details"):
+                        st.write(listing['description'])
+                        st.markdown(f"**Neighborhood:** {listing['neighbourhood']}")
+                    
+                    st.link_button("🔗 View Official Listing", listing['listing_url'])
                 
-                st.markdown(f"### {listing['name']}")
-                st.markdown(f"**Match Score: `{match_pct}%`**")
-                
-                # Use columns for quick stats
-                c1, c2, c3 = st.columns(3)
-                c1.metric("Price", f"€{listing['price']}")
-                c2.metric("Guests", listing['accommodates'])
-                c3.metric("Beds", listing['bedrooms'])
-                
-                with st.expander("View Description"):
-                    st.write(listing['description'])
-                
-                st.markdown(f"📍 **Location:** {listing['neighbourhood']}")
-                st.link_button("View on Airbnb", listing['listing_url'], type="secondary")
-            
-            st.divider()
+                st.divider()
+    except Exception as e:
+        st.error(f"Error generating recommendations: {e}")
 
-# --- SIDEBAR ---
-with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_Bélo.svg/2560px-Airbnb_Logo_Bélo.svg.png", width=150)
-    st.title("Dublin StaySelect")
-    st.info("Our AI analyzes your past stays to find your next perfect Dublin home.")
-    
-    st.divider()
-    st.subheader("Frequent Users")
-    top_ids = load_data()['reviewer_id'].value_counts().head(5).index.tolist()
-    selected_user = st.selectbox("Select a Test User ID:", top_ids)
-
-# --- MAIN APP ---
+# 5. SIDEBAR & MAIN INTERFACE
 def main():
-    final_model = load_suggestion_model()
     raw_df = load_data()
+    final_model = load_suggestion_model()
 
-    # Hero Section
-    st.markdown("# Find your next favorite stay.")
-    user_input = st.number_input("Enter your User ID to begin:", value=selected_user)
+    # Sidebar
+    with st.sidebar:
+        st.title("🍀 DublinStay")
+        st.markdown("---")
+        st.subheader("Quick Test Profiles")
+        top_ids = raw_df['reviewer_id'].value_counts().head(5).index.tolist()
+        selected_id = st.selectbox("Choose a frequent reviewer:", top_ids)
+        st.info("This system uses Collaborative Filtering to predict your preferences based on Dublin's rental history.")
 
-    if st.button("Generate My Recommendations", type="primary", use_container_width=True):
-        with st.spinner('Calculating your perfect matches...'):
+    # Main Hero Section
+    st.title("Personalized Dublin Stays")
+    st.markdown("Enter your User ID below to see your custom-curated accommodation matches.")
+    
+    col_a, col_b = st.columns([2, 1])
+    with col_a:
+        user_input = st.number_input("User ID:", value=int(selected_id))
+    
+    if st.button("Generate Recommendations"):
+        with st.spinner('Analyzing the Dublin market for you...'):
             recommend_airbnbs(user_input, raw_df, final_model)
 
 if __name__ == "__main__":
