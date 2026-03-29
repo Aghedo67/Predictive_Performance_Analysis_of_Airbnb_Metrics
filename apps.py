@@ -114,6 +114,65 @@ def calculate_frequency_encodings(neighbourhood, property_type, df):
         p_freq = df['property_type_freq'].mean()
 
     return n_freq, p_freq
+# -------------------- TAB 3 --------------------
+with tab3:
+    st.subheader("Model Performance & Insights")
+
+    # --- New Evaluation Metrics Section ---
+    col_m1, col_m2, col_m3 = st.columns(3)
+    
+    with col_m1:
+        st.metric("R² Score", "0.6925", help="Explains how much variance the model captures (closer to 1.0 is better).")
+    with col_m2:
+        st.metric("Test RMSE", "0.3910", delta_color="inverse", help="Root Mean Squared Error on log-scale.")
+    with col_m3:
+        st.metric("Test MAE", "0.2665", delta_color="inverse", help="Mean Absolute Error on log-scale.")
+
+    st.markdown("---")
+
+    # --- Feature Importance Section ---
+    st.subheader("Feature Importance (XGBoost)")
+
+    # Extract model (handle pipeline case)
+    if hasattr(model, "named_steps"):
+        model_step = model.named_steps.get('xgb', model)
+    else:
+        model_step = model
+
+    if hasattr(model_step, 'feature_importances_'):
+        feature_names = [
+            'host_response_rate', 'host_is_superhost',
+            'host_listings_count', 'accommodates',
+            'bedrooms', 'beds',
+            'review_scores_rating', 'number_of_reviews',
+            'review_scores_cleanliness', 'review_scores_location',
+            'maximum_nights',
+            'neighbourhood_freq', 'property_type_freq'
+        ]
+
+        fi = pd.DataFrame({
+            "Feature": feature_names,
+            "Importance": model_step.feature_importances_
+        }).sort_values(by="Importance", ascending=True)
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+        # Using a nice color to match your theme
+        ax.barh(fi["Feature"], fi["Importance"], color='#ff5a5f')
+        ax.set_xlabel("Importance Weight")
+        ax.set_title("Top Features Driving Airbnb Prices")
+        
+        # Remove spines for a cleaner look
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+
+        st.pyplot(fig)
+
+        with st.expander("📄 View Raw Importance Values"):
+            st.dataframe(fi.sort_values(by="Importance", ascending=False), use_container_width=True)
+
+    else:
+        st.warning("Feature importance not available for this model.")
+"""
 ## -------------------- TAB 3 --------------------
 with tab3:
     st.subheader("Feature Importance (XGBoost Model)")
@@ -157,7 +216,7 @@ with tab3:
 
     else:
         st.warning("Feature importance not available for this model.")
-
+"""
 # -------------------- TAB 4 --------------------
 with tab4:
     st.subheader("Enter Property Details")
