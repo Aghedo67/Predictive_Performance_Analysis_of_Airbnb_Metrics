@@ -72,7 +72,7 @@ def recommend_airbnbs(user_id, listings_df, final_model):
                 with col1:
                     img = get_image(listing['picture_url'])
                     if img:
-                        st.image(img, use_container_width=True)
+                        st.image(img, use_column_width=True)
                     else:
                         st.info("No Preview Image Available")
 
