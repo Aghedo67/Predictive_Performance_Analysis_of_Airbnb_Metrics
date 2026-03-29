@@ -86,12 +86,16 @@ def main():
     # Sidebar
     with st.sidebar:
         st.title("🍀 DublinStay")
-        st.subheader("📊 Model Performance")
+        
+        # --- ENHANCED PERFORMANCE METRICS ---
+        st.subheader("📊 Model Stats")
+        st.metric("Training Samples", "276,126") # Added your dataset size
         c1, c2 = st.columns(2)
         c1.metric("RMSE", "0.4347")
         c2.metric("MAE", "0.3205")
         st.caption("BaselineOnly Model | 5-Fold CV")
         st.markdown("---")
+        
         top_ids = raw_df['reviewer_id'].value_counts().head(5).index.tolist()
         selected_id = st.selectbox("Quick Test Profiles:", top_ids)
 
@@ -111,7 +115,8 @@ def main():
         col_left, col_right = st.columns(2)
         with col_left:
             st.subheader("⚠️ Technical Limitations")
-            st.write("""
+            st.write(f"""
+            - **Data Volume:** Trained on **276,126** records. While robust, processing high volumes for real-time inference can cause latency.
             - **Positivity Bias:** Most reviews are highly positive (0.8–1.0), making it hard to distinguish 'good' from 'great'.
             - **Cold Start:** New listings without reviews cannot be recommended by this model.
             - **Sentiment vs. Reality:** A score of 0.0 might mean a neutral stay or just a very short, non-descriptive review.
