@@ -211,10 +211,10 @@ def recommend_airbnbs(user_id, listings_df, final_model):
                 # Additional details section
                 st.markdown("**Property Details:**")
                 st.markdown(f"""
-                * Accommodates: {listing['accommodates']} guests
-                * Bedrooms: {listing['bedrooms']}
-                * Bathrooms: {listing['bathrooms']}
-                * Rating: {listing['avg_rating']}/5 ({listing['number_of_reviews']} reviews)
+                #* Accommodates: {listing['accommodates']} guests
+                #* Bedrooms: {listing['bedrooms']}
+                #* Bathrooms: {listing['bathrooms']}
+                #* Rating: {listing['avg_rating']}/5 ({listing['number_of_reviews']} reviews)
                 """)
 
                 # Add "View Listing" button
