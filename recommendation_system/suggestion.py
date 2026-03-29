@@ -7,132 +7,112 @@ Original file is located at
     https://colab.research.google.com/drive/1UHYT1P4IJrL782h107DrSatkb1xUo7pC
 """
 
+
 import streamlit as st
-import pickle
 import joblib
-import gzip
 import pandas as pd
 from PIL import Image
 import requests
 from io import BytesIO
 
-# Add caching for data and model loading
+# PAGE CONFIG: Set a custom theme and wide layout
+st.set_page_config(page_title="Dublin StaySelect", page_icon="🍀", layout="wide")
+
+# Custom CSS for a "Premium" look
+st.markdown("""
+    <style>
+    .main { background-color: #f8f9fa; }
+    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .rec-card { border: 1px solid #ddd; padding: 20px; border-radius: 15px; margin-bottom: 20px; background: white; }
+    .price-tag { color: #FF5A5F; font-size: 24px; font-weight: bold; }
+    </style>
+    """, unsafe_allow_headers=True)
+
 @st.cache_data
 def load_data():
-    raw_df = pd.read_csv('dublin_merged_df(1).csv.gz', compression='gzip')
-    return raw_df
+    return pd.read_csv('dublin_merged_df(1).csv.gz', compression='gzip')
 
 @st.cache_resource
 def load_suggestion_model():
     return joblib.load('recommendation_system/baseline_model.pkl')
 
-# Initialize the app
-st.title("Guest Personalized Listing System")
-st.info("Get personalized Airbnb listing suggestions based on your user profile")
-
-# Load data and model
-final_model = load_suggestion_model()
-raw_df = load_data()
+def get_image(url):
+    try:
+        response = requests.get(url, timeout=5)
+        return Image.open(BytesIO(response.content))
+    except:
+        return None
 
 def recommend_airbnbs(user_id, listings_df, final_model):
-    """
-    Suggest 5 personalized Dublin Airbnb listings using Streamlit
-    """
-    try:
-        # Get listings already rated by the user
-        user_listings = listings_df[listings_df['reviewer_id'] == user_id]['id_x'].unique()
+    all_listings = listings_df['id_x'].unique()
+    user_listings = listings_df[listings_df['reviewer_id'] == user_id]['id_x'].unique()
+    listings_to_predict = list(set(all_listings) - set(user_listings))
+    
+    # Predict
+    user_listing_pairs = [(user_id, lid, 0) for lid in listings_to_predict]
+    predictions = final_model.test(user_listing_pairs)
+    top_recs = sorted(predictions, key=lambda x: x.est, reverse=True)[:5]
 
-        # Get all listings
-        all_listings = listings_df['id_x'].unique()
-
-        # Identify listings not yet rated by the user
-        listings_to_predict = list(set(all_listings) - set(user_listings))
-
-        # Create matrix for predictions
-        user_listing_pairs = [(user_id, listing_id, 0) for listing_id in listings_to_predict]
-
-        # Get predictions
-        predictions = final_model.test(user_listing_pairs)
-
-        # Get top 5 recommendations
-        top_5_recs = sorted(predictions, key=lambda x: x.est, reverse=True)[:5]
-
-        st.header("Your Personalized Recommendations")
-
-        # Display recommendations in the main area
-        for idx, rec in enumerate(top_5_recs, 1):
-            # Get listing details
-            listing = listings_df[listings_df['id_x'] == rec.iid].iloc[0]
-
-            st.markdown(f"### Recommendation #{idx}: {listing['name']}")
-
-            # Create three columns for the layout
-            col1, col2 = st.columns([2, 1])
-
+    st.subheader(f"✨ Handpicked for Guest #{user_id}")
+    
+    for idx, rec in enumerate(top_recs, 1):
+        listing = listings_df[listings_df['id_x'] == rec.iid].iloc[0]
+        
+        # UI Container for each recommendation
+        with st.container():
+            col1, col2 = st.columns([1, 2])
+            
             with col1:
-                # Main listing details
-                st.markdown(f"**Description:** {listing['description']}")
-                st.markdown(f"**Price:** £{listing['price']} per night")
-                st.markdown(f"**Location:** {listing['neighbourhood']}")
-                #st.markdown(f"**Property Type:** {listing['property_type_freq']}")
-
-                # Additional details section
-                st.markdown("**Property Details:**")
-                st.markdown(f"""
-                * Accommodates: {listing['accommodates']} guests
-                * Bedrooms: {listing['bedrooms']}
-                * Bathrooms: {listing['bathrooms']}
-                """)
-
-                # Add "View Listing" button
-                #if st.button(f"View Listing #{idx}", key=f"btn_{idx}"):
-                # Replace your 'if st.button' block with this:
-                st.markdown(f"🖼️ [View The Airbnb Listing]({listing['listing_url']})")
-
-                    # Display image
-                    #response = requests.get(listing['picture_url'])
-                    #img = Image.open(BytesIO(response.content))
-                    #st.image(img, use_column_width=True)
-                    #st.markdown(f"[Open Airbnb Listing]({listing['listing_url']})")
+                img = get_image(listing['picture_url'])
+                if img:
+                    st.image(img, use_container_width=True, caption=f"Dublin, {listing['neighbourhood']}")
+                else:
+                    st.warning("No image available")
 
             with col2:
-                try:
-                    # Display image
-                    response = requests.get(listing['picture_url'])
-                    img = Image.open(BytesIO(response.content))
-                    st.image(img, use_column_width=True)
-                except Exception as e:
-                    st.error("Unable to load image")
-
-            # Add a divider between recommendations
+                # Calculate a "Match Score" percentage for flair
+                match_pct = min(99, int((rec.est / 5) * 100)) 
+                
+                st.markdown(f"### {listing['name']}")
+                st.markdown(f"**Match Score: `{match_pct}%`**")
+                
+                # Use columns for quick stats
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Price", f"€{listing['price']}")
+                c2.metric("Guests", listing['accommodates'])
+                c3.metric("Beds", listing['bedrooms'])
+                
+                with st.expander("View Description"):
+                    st.write(listing['description'])
+                
+                st.markdown(f"📍 **Location:** {listing['neighbourhood']}")
+                st.link_button("View on Airbnb", listing['listing_url'], type="secondary")
+            
             st.divider()
 
-    except Exception as e:
-        st.error(f"An error occurred: {str(e)}")
+# --- SIDEBAR ---
+with st.sidebar:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_Bélo.svg/2560px-Airbnb_Logo_Bélo.svg.png", width=150)
+    st.title("Dublin StaySelect")
+    st.info("Our AI analyzes your past stays to find your next perfect Dublin home.")
+    
+    st.divider()
+    st.subheader("Frequent Users")
+    top_ids = load_data()['reviewer_id'].value_counts().head(5).index.tolist()
+    selected_user = st.selectbox("Select a Test User ID:", top_ids)
 
-# In your main() function
-st.sidebar.subheader("Test IDs")
-top_ids = raw_df['reviewer_id'].value_counts().head(5).index.tolist()
-st.sidebar.write("Try these frequent users:")
-st.sidebar.code(f"{top_ids}")
-
+# --- MAIN APP ---
 def main():
-    # Create a container for the input section
-    with st.container():
-        # Create columns for better layout
-        col1, col2, col3 = st.columns([1, 2, 1])
+    final_model = load_suggestion_model()
+    raw_df = load_data()
 
-        with col2:
-            st.subheader("Enter Your Details")
-            user_id = st.number_input(
-                "User ID:",
-                min_value=1,
-                value=1412033,
-                help="Enter your user ID to get personalized recommendations"
-            )
+    # Hero Section
+    st.markdown("# Find your next favorite stay.")
+    user_input = st.number_input("Enter your User ID to begin:", value=selected_user)
 
-            if st.button("Get Recommendations", type="primary"):
-                recommend_airbnbs(user_id, raw_df, final_model)
+    if st.button("Generate My Recommendations", type="primary", use_container_width=True):
+        with st.spinner('Calculating your perfect matches...'):
+            recommend_airbnbs(user_input, raw_df, final_model)
 
 if __name__ == "__main__":
     main()
