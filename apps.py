@@ -62,7 +62,7 @@ st.markdown("### AI-powered pricing tool for smarter Airbnb listings")
 col1, col2, col3 = st.columns(3)
 
 col1.metric("📊 Avg Price", f"€{round(df['price'].mean(), 2)}")
-col2.metric("⭐ Avg Rating", round(df['review_scores_rating'].mean(), 2))
+col2.metric("⭐ Overall Rating", round(df['review_scores_rating'].mean(), 2))
 col3.metric("🏘️ Listings", len(df))
 
 # -------------------- TABS --------------------
