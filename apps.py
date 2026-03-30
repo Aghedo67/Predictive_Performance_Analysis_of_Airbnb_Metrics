@@ -62,7 +62,7 @@ st.markdown("### AI-powered pricing tool for smarter Airbnb listings")
 col1, col2, col3 = st.columns(3)
 
 col1.metric("📊 Avg Price", f"€{round(df['price'].mean(), 2)}")
-col2.metric("⭐ Avg Rating", round(df['review_scores_rating'].mean(), 2))
+col2.metric("⭐ Overall Rating", round(df['review_scores_rating'].mean(), 2))
 col3.metric("🏘️ Listings", len(df))
 
 # -------------------- TABS --------------------
@@ -114,50 +114,83 @@ def calculate_frequency_encodings(neighbourhood, property_type, df):
         p_freq = df['property_type_freq'].mean()
 
     return n_freq, p_freq
-## -------------------- TAB 3 --------------------
+# -------------------- TAB 3 --------------------
 with tab3:
-    st.subheader("Feature Importance (XGBoost Model)")
+    st.subheader("Model Performance & Reliability")
 
-    # Extract model (handle pipeline case)
-    if hasattr(model, "named_steps"):
-        model_step = model.named_steps.get('xgb', model)
-    else:
-        model_step = model
+    # --- 1. Evaluation Metrics ---
+    col_m1, col_m2, col_m3 = st.columns(3)
+    with col_m1:
+        st.metric("R² Score", "0.6925", help="Explains 69% of price variance. Higher is better.")
+    with col_m2:
+        st.metric("Test RMSE (Log)", "0.3910", help="Root Mean Squared Error on log-transformed prices.")
+    with col_m3:
+        st.metric("Test MAE (Log)", "0.2665", help="Mean Absolute Error. Roughly 26-30% error in Euro terms.")
 
-    if hasattr(model_step, 'feature_importances_'):
+    st.markdown("---")
 
-        feature_names = [
-            'host_response_rate', 'host_is_superhost',
-            'host_listings_count', 'accommodates',
-            'bedrooms', 'beds',
-            'review_scores_rating', 'number_of_reviews',
-            'review_scores_cleanliness', 'review_scores_location',
-            'maximum_nights',
-            'neighbourhood_freq', 'property_type_freq'
-        ]
+    # --- 2. Feature Importance ---
+    col_left, col_right = st.columns([2, 1])
 
-        fi = pd.DataFrame({
-            "Feature": feature_names,
-            "Importance": model_step.feature_importances_
-        }).sort_values(by="Importance", ascending=True)
+    with col_left:
+        st.subheader("📊 Feature Importance (XGBoost)")
+        if hasattr(model, "named_steps"):
+            model_step = model.named_steps.get('xgb', model)
+        else:
+            model_step = model
 
-        # 🔥 Fancy horizontal bar chart
-        st.markdown("### 📊 Feature Importance Ranking")
+        if hasattr(model_step, 'feature_importances_'):
+            feature_names = [
+                'host_response_rate', 'host_is_superhost', 'host_listings_count', 
+                'accommodates', 'bedrooms', 'beds', 'review_scores_rating', 
+                'number_of_reviews', 'review_scores_cleanliness', 
+                'review_scores_location', 'maximum_nights', 
+                'neighbourhood_freq', 'property_type_freq'
+            ]
+            fi = pd.DataFrame({"Feature": feature_names, "Importance": model_step.feature_importances_}).sort_values(by="Importance", ascending=True)
+            
+            fig, ax = plt.subplots(figsize=(8, 5))
+            ax.barh(fi["Feature"], fi["Importance"], color='#ff5a5f')
+            ax.set_title("Key Drivers of Listing Price")
+            st.pyplot(fig)
+        else:
+            st.warning("Feature importance not available.")
 
-        fig, ax = plt.subplots()
-        ax.barh(fi["Feature"], fi["Importance"])
-        ax.set_xlabel("Importance")
-        ax.set_title("Top Features Driving Airbnb Prices")
+    with col_right:
+        st.subheader("⚠️ Model Limitations")
+        st.info("""
+        **Unexplained Variance (31%)**
+        The model cannot see 'intangibles' like interior design, professional photography, or proximity to specific landmarks.
+        
+        **The Log-Scale Effect**
+        Because errors are calculated on a log scale, the model may struggle with extreme luxury or extreme budget listings.
+        """)
 
-        st.pyplot(fig)
+    st.markdown("---")
 
-        # Optional: display table
-        with st.expander("📄 View Raw Importance Values"):
-            st.dataframe(fi)
+    # --- 3. Ethical Considerations ---
+    st.subheader("⚖️ Ethical & Social Considerations")
+    
+    eth_col1, eth_col2 = st.columns(2)
+    
+    with eth_col1:
+        st.markdown("""
+        **Gentrification Risk**
+        By suggesting prices based on 'Neighborhood Frequency,' the tool may inadvertently encourage price inflation in developing areas, potentially impacting local housing affordability.
+        """)
+    
+    with eth_col2:
+        st.markdown("""
+        **The Professional Bias**
+        The model rewards 'Superhost' status and high response rates. This naturally favors professional property managers over casual 'mom-and-pop' hosts who may lack 24/7 staffing.
+        """)
 
-    else:
-        st.warning("Feature importance not available for this model.")
-
+    with st.expander("🔍 Note on Proxy Bias"):
+        st.write("""
+        Even without demographic data, variables like 'Location Score' and 'Review Ratings' can act as proxies for human bias. 
+        If travelers provide lower ratings to hosts in specific ethnic enclaves, the AI will learn to 'devalue' those listings, 
+        automating existing prejudices into the pricing structure.
+        """)
 # -------------------- TAB 4 --------------------
 with tab4:
     st.subheader("Enter Property Details")
@@ -179,7 +212,7 @@ with tab4:
 
     col3, col4 = st.columns(2)
     with col3:
-        rating = st.slider("Rating", 0.0, 5.0, 4.5)
+        rating = st.slider("Overall Rating", 0.0, 5.0, 4.5)
         cleanliness = st.slider("Cleanliness", 0.0, 5.0, 4.5)
     with col4:
         location = st.slider("Location Score", 0.0, 5.0, 4.5)
