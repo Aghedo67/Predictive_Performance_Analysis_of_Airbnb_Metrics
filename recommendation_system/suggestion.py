@@ -12,6 +12,8 @@ import pandas as pd
 from PIL import Image
 import requests
 from io import BytesIO
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # 1. PAGE CONFIG
 st.set_page_config(page_title="Dublin StaySelect", page_icon="🍀", layout="wide")
@@ -86,10 +88,8 @@ def main():
     # Sidebar
     with st.sidebar:
         st.title("🍀 DublinStay")
-        
-        # --- ENHANCED PERFORMANCE METRICS ---
         st.subheader("📊 Model Stats")
-        st.metric("Training Samples", "276,126") # Added your dataset size
+        st.metric("Training Samples", "276,126") 
         c1, c2 = st.columns(2)
         c1.metric("RMSE", "0.4347")
         c2.metric("MAE", "0.3205")
@@ -98,9 +98,10 @@ def main():
         
         top_ids = raw_df['reviewer_id'].value_counts().head(5).index.tolist()
         selected_id = st.selectbox("Quick Test Profiles:", top_ids)
+        st.info("This is a Supervised Learning system using Collaborative Filtering.")
 
     # Tabs for Organization
-    tab1, tab2 = st.tabs(["🔍 Find Stays", "⚖️ Ethics & Limitations"])
+    tab1, tab2 = st.tabs(["🔍 Find Stays", "⚖️ Ethics & Insights"])
 
     with tab1:
         st.title("Personalized Dublin Stays")
@@ -110,24 +111,34 @@ def main():
                 recommend_airbnbs(user_input, raw_df, final_model)
 
     with tab2:
-        st.header("Project Considerations")
+        st.header("Project Insights & Considerations")
         
+        # --- ADDING THE VISUALIZATION ---
+        st.subheader("📈 Sentiment Distribution")
+        fig, ax = plt.subplots(figsize=(10, 4))
+        # Assuming 'compound_scores' is the column name in your CSV
+        sns.histplot(raw_df['compound_scores'], kde=True, ax=ax, color="#FF5A5F")
+        ax.set_title("Distribution of Sentiment Scores (Training Data)")
+        st.pyplot(fig)
+        
+        st.divider()
+
         col_left, col_right = st.columns(2)
         with col_left:
             st.subheader("⚠️ Technical Limitations")
             st.write(f"""
-            - **Data Volume:** Trained on **276,126** records. While robust, processing high volumes for real-time inference can cause latency.
-            - **Positivity Bias:** Most reviews are highly positive (0.8–1.0), making it hard to distinguish 'good' from 'great'.
-            - **Cold Start:** New listings without reviews cannot be recommended by this model.
-            - **Sentiment vs. Reality:** A score of 0.0 might mean a neutral stay or just a very short, non-descriptive review.
+            - **Data Volume:** Trained on **276,126** records.
+            - **Positivity Bias:** As seen in the chart above, most reviews are 0.8+, making it hard to find 'bad' stays.
+            - **Cold Start:** New listings without reviews cannot be recommended.
+            - **Sentiment vs. Reality:** 0.0 scores might be neutral or just short reviews.
             """)
         
         with col_right:
             st.subheader("🛡️ Ethical Considerations")
             st.write("""
-            - **Gentrification Risk:** Highlighting only 'popular' areas can drive up local rents and push out residents.
-            - **Echo Chambers:** The model may limit your discovery by only showing stays similar to what you've seen before.
-            - **Privacy:** Reviewer data is anonymized, but travel patterns can still be sensitive.
+            - **Gentrification Risk:** Promoting popular areas can impact local housing availability.
+            - **Echo Chambers:** Recommending similar stays may limit user discovery of new areas.
+            - **Privacy:** Reviewer IDs are used to maintain history while protecting direct identity.
             """)
         
         st.warning("Note: Recommendations are based on historical sentiment and may not reflect current property conditions.")
