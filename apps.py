@@ -212,7 +212,7 @@ with tab4:
 
     col3, col4 = st.columns(2)
     with col3:
-        rating = st.slider("Rating", 0.0, 5.0, 4.5)
+        rating = st.slider("Overall Rating", 0.0, 5.0, 4.5)
         cleanliness = st.slider("Cleanliness", 0.0, 5.0, 4.5)
     with col4:
         location = st.slider("Location Score", 0.0, 5.0, 4.5)
