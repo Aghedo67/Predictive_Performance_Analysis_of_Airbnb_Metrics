@@ -11,6 +11,7 @@ import streamlit as st
 import joblib
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 # -------------------- PAGE CONFIG --------------------
