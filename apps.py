@@ -116,8 +116,7 @@ def calculate_frequency_encodings(neighbourhood, property_type, df):
         p_freq = df['property_type_freq'].mean()
 
     return n_freq, p_freq
-# -------------------- TAB 3 --------------------
-# -------------------- TAB 3 --------------------
+# -------------------- TAB 3: MODEL & MARKET INSIGHTS --------------------
 with tab3:
     st.subheader("Model Performance & Reliability")
 
@@ -132,30 +131,47 @@ with tab3:
 
     st.markdown("---")
 
-    # --- NEW: Time Series Trends (Requested Visual 1) ---
-    st.subheader("📅 Market Growth Trends")
-    fig_time, ax_time = plt.subplots(figsize=(15, 6))
+    # --- 2. Market Growth Trends (Corrected Visual 1) ---
+    st.subheader("📅 Dublin Market Growth Trends")
     
-    # Using raw_df for temporal data
-    raw_df.set_index('host_since').resample('MS').size().plot(
-        label='New Hosts Joining', color='orange', ax=ax_time
-    )
-    raw_df.set_index('first_review').resample('MS').size().plot(
-        label='New Listings Active (First Review)', color='red', ax=ax_time
-    )
-    
-    ax_time.set_title('Dublin Market Growth: Hosts vs active Listings')
-    ax_time.set_xlim('2009-11-25', '2025-04-30')
-    ax_time.legend()
-    st.pyplot(fig_time)
+    try:
+        # Prepare data for time-series: Convert to datetime and drop NaNs
+        # We do this locally to ensure the index is clean for resampling
+        ts_df = raw_df.copy()
+        ts_df['host_since'] = pd.to_datetime(ts_df['host_since'], errors='coerce')
+        ts_df['first_review'] = pd.to_datetime(ts_df['first_review'], errors='coerce')
+
+        fig_time, ax_time = plt.subplots(figsize=(15, 6))
+
+        # Plot 1: Hosts joining (Resampled by Month Start 'MS')
+        ts_df.dropna(subset=['host_since']).set_index('host_since').resample('MS').size().plot(
+            label='New Hosts Joining Airbnb', color='orange', ax=ax_time, linewidth=2
+        )
+
+        # Plot 2: Listings getting first review
+        ts_df.dropna(subset=['first_review']).set_index('first_review').resample('MS').size().plot(
+            label='Listings Getting First Review', color='red', ax=ax_time, alpha=0.7
+        )
+
+        ax_time.set_title('Dublin Host Acquisition vs. Listing Activation', fontsize=14)
+        ax_time.set_xlim('2009-11-25', '2025-04-30')
+        ax_time.set_xlabel('Year')
+        ax_time.set_ylabel('Count of Events')
+        ax_time.legend()
+        
+        st.pyplot(fig_time)
+    except Exception as e:
+        st.error(f"Error rendering time-series: {e}")
 
     st.markdown("---")
 
-    # --- 2. Feature Importance & Correlation ---
+    # --- 3. Feature Importance & Correlation ---
     col_left, col_right = st.columns([2, 1])
 
     with col_left:
         st.subheader("📊 Feature Importance (XGBoost)")
+        
+        # Accessing the model from the pipeline
         if hasattr(model, "named_steps"):
             model_step = model.named_steps.get('xgb', model)
         else:
@@ -169,59 +185,68 @@ with tab3:
                 'review_scores_location', 'maximum_nights', 
                 'neighbourhood_freq', 'property_type_freq'
             ]
-            fi = pd.DataFrame({"Feature": feature_names, "Importance": model_step.feature_importances_}).sort_values(by="Importance", ascending=True)
+            # Ensure the feature names match the model's expected input count
+            fi = pd.DataFrame({
+                "Feature": feature_names, 
+                "Importance": model_step.feature_importances_
+            }).sort_values(by="Importance", ascending=True)
             
             fig_fi, ax_fi = plt.subplots(figsize=(8, 6))
             ax_fi.barh(fi["Feature"], fi["Importance"], color='#ff5a5f')
             ax_fi.set_title("Key Drivers of Listing Price")
             st.pyplot(fig_fi)
         else:
-            st.warning("Feature importance not available.")
+            st.warning("Feature importance data is not available for this model.")
 
     with col_right:
         st.subheader("⚠️ Model Limitations")
         st.info("""
         **Unexplained Variance (31%)**
-        The model cannot see 'intangibles' like interior design or proximity to specific landmarks.
+        The model cannot account for 'intangibles' like interior design, professional photography, or the specific view from a window.
         
         **The Log-Scale Effect**
-        Errors are calculated on a log scale; the model may struggle with extreme luxury or extreme budget listings.
+        Because the model was trained on log-transformed prices, it is more accurate for mid-range properties than extreme luxury or budget listings.
         """)
 
     st.markdown("---")
 
-    # --- NEW: Correlation Matrix (Requested Visual 2) ---
+    # --- 4. Correlation Matrix (Corrected Visual 2) ---
     st.subheader("🔗 Feature Correlations")
     with st.expander("View Full Correlation Heatmap"):
         import seaborn as sns
-        numeric_df = raw_df.select_dtypes(include=['number'])
-        correlation_matrix = numeric_df.corr()
         
-        fig_corr, ax_corr = plt.subplots(figsize=(12, 8))
-        sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5, ax=ax_corr)
-        st.pyplot(fig_corr)
+        # Filter for numeric only and drop columns with zero variance (all NaNs)
+        numeric_df = raw_df.select_dtypes(include=['number']).dropna(axis=1, how='all')
+        
+        if not numeric_df.empty:
+            correlation_matrix = numeric_df.corr()
+            fig_corr, ax_corr = plt.subplots(figsize=(18, 10))
+            sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5, ax=ax_corr)
+            ax_corr.set_title("Feature Correlation Matrix")
+            st.pyplot(fig_corr)
+        else:
+            st.warning("Not enough numeric data found to generate a correlation matrix.")
 
-    # --- 3. Ethical Considerations ---
+    # --- 5. Ethical Considerations ---
     st.subheader("⚖️ Ethical & Social Considerations")
     
     eth_col1, eth_col2 = st.columns(2)
-    
     with eth_col1:
         st.markdown("""
         **Gentrification Risk**
-        By suggesting prices based on 'Neighborhood Frequency,' the tool may encourage price inflation in developing areas.
+        By suggesting prices based on 'Neighborhood Frequency,' the tool may inadvertently encourage price inflation in developing areas, impacting local housing affordability.
         """)
-    
     with eth_col2:
         st.markdown("""
         **The Professional Bias**
-        The model rewards 'Superhost' status, favoring professional managers over casual hosts.
+        The model rewards 'Superhost' status and high response rates, favoring professional property managers over casual 'mom-and-pop' hosts.
         """)
 
     with st.expander("🔍 Note on Proxy Bias"):
         st.write("""
-        Variables like 'Location Score' and 'Review Ratings' can act as proxies for human bias. 
-        If travelers provide lower ratings to hosts in specific ethnic enclaves, the AI will learn to 'devalue' those listings.
+        Even without explicit demographic data, variables like 'Location Score' and 'Review Ratings' can act as proxies for human bias. 
+        If travelers provide lower ratings based on subjective biases, the AI may 'learn' to devalue those listings, 
+        automating existing prejudices into the pricing structure.
         """)
 # -------------------- TAB 4 --------------------
 with tab4:
