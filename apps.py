@@ -74,6 +74,7 @@ with tab1:
     st.dataframe(df, use_container_width=True)
 
 # -------------------- TAB 2 --------------------
+# -------------------- TAB 2 --------------------
 with tab2:
     col1, col2 = st.columns(2)
 
@@ -90,30 +91,40 @@ with tab2:
 
     with col2:
         st.subheader("Price Distribution")
-        fig, ax = plt.subplots()
-        ax.hist(df['price'], bins=20)
-        st.pyplot(fig)
+        fig_dist, ax_dist = plt.subplots()
+        ax_dist.hist(df['price'], bins=20, color='#ff5a5f', edgecolor='white')
+        st.pyplot(fig_dist)
 
         monthly = raw_df.groupby('month')['price'].mean().reset_index()
-        monthly['month'] = pd.to_datetime(monthly['month'], format='%m').dt.strftime('%B')
+        monthly['month_name'] = pd.to_datetime(monthly['month'], format='%m').dt.strftime('%B')
         st.subheader("Monthly Trends")
-        st.line_chart(monthly, x='month', y='price')
+        st.line_chart(monthly, x='month_name', y='price')
 
     st.subheader("Geographical Distribution")
-    st.map(raw_df.sample(1000), latitude='latitude', longitude='longitude', width='stretch')
+    st.map(raw_df.sample(1000), latitude='latitude', longitude='longitude')
 
-# -------------------- ENCODING --------------------
-@st.cache_data
-def calculate_frequency_encodings(neighbourhood, property_type, df):
-    n_freq = df[df['neighbourhood'] == neighbourhood]['neighbourhood_freq'].mean()
-    p_freq = df[df['property_type'] == property_type]['property_type_freq'].mean()
+    # -------------------- NEW: CORRELATION MATRIX --------------------
+    st.markdown("---")
+    st.subheader("🔗 Feature Correlation Analysis")
+    with st.expander("View Full Correlation Heatmap"):
+        # Filter for numeric columns
+        numeric_df = raw_df.select_dtypes(include=['number'])
+        correlation_matrix = numeric_df.corr()
 
-    if pd.isna(n_freq):
-        n_freq = df['neighbourhood_freq'].mean()
-    if pd.isna(p_freq):
-        p_freq = df['property_type_freq'].mean()
-
-    return n_freq, p_freq
+        # Plotting with Seaborn
+        fig_corr, ax_corr = plt.subplots(figsize=(15, 10))
+        sns.heatmap(
+            correlation_matrix, 
+            annot=True, 
+            cmap='coolwarm', 
+            fmt='.2f', 
+            linewidths=0.5, 
+            ax=ax_corr
+        )
+        plt.title('Correlation Matrix of Listing Features')
+        st.pyplot(fig_corr)
+        
+        st.caption("This heatmap shows how features like 'accommodates' or 'bedrooms' correlate with price and each other.")
 # -------------------- TAB 3 --------------------
 with tab3:
     st.subheader("Model Performance & Reliability")
