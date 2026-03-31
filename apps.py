@@ -115,6 +115,7 @@ def calculate_frequency_encodings(neighbourhood, property_type, df):
 
     return n_freq, p_freq
 # -------------------- TAB 3 --------------------
+# -------------------- TAB 3 --------------------
 with tab3:
     st.subheader("Model Performance & Reliability")
 
@@ -129,7 +130,26 @@ with tab3:
 
     st.markdown("---")
 
-    # --- 2. Feature Importance ---
+    # --- NEW: Time Series Trends (Requested Visual 1) ---
+    st.subheader("📅 Market Growth Trends")
+    fig_time, ax_time = plt.subplots(figsize=(15, 6))
+    
+    # Using raw_df for temporal data
+    raw_df.set_index('host_since').resample('MS').size().plot(
+        label='New Hosts Joining', color='orange', ax=ax_time
+    )
+    raw_df.set_index('first_review').resample('MS').size().plot(
+        label='New Listings Active (First Review)', color='red', ax=ax_time
+    )
+    
+    ax_time.set_title('Dublin Market Growth: Hosts vs active Listings')
+    ax_time.set_xlim('2009-11-25', '2025-04-30')
+    ax_time.legend()
+    st.pyplot(fig_time)
+
+    st.markdown("---")
+
+    # --- 2. Feature Importance & Correlation ---
     col_left, col_right = st.columns([2, 1])
 
     with col_left:
@@ -149,10 +169,10 @@ with tab3:
             ]
             fi = pd.DataFrame({"Feature": feature_names, "Importance": model_step.feature_importances_}).sort_values(by="Importance", ascending=True)
             
-            fig, ax = plt.subplots(figsize=(8, 5))
-            ax.barh(fi["Feature"], fi["Importance"], color='#ff5a5f')
-            ax.set_title("Key Drivers of Listing Price")
-            st.pyplot(fig)
+            fig_fi, ax_fi = plt.subplots(figsize=(8, 6))
+            ax_fi.barh(fi["Feature"], fi["Importance"], color='#ff5a5f')
+            ax_fi.set_title("Key Drivers of Listing Price")
+            st.pyplot(fig_fi)
         else:
             st.warning("Feature importance not available.")
 
@@ -160,13 +180,24 @@ with tab3:
         st.subheader("⚠️ Model Limitations")
         st.info("""
         **Unexplained Variance (31%)**
-        The model cannot see 'intangibles' like interior design, professional photography, or proximity to specific landmarks.
+        The model cannot see 'intangibles' like interior design or proximity to specific landmarks.
         
         **The Log-Scale Effect**
-        Because errors are calculated on a log scale, the model may struggle with extreme luxury or extreme budget listings.
+        Errors are calculated on a log scale; the model may struggle with extreme luxury or extreme budget listings.
         """)
 
     st.markdown("---")
+
+    # --- NEW: Correlation Matrix (Requested Visual 2) ---
+    st.subheader("🔗 Feature Correlations")
+    with st.expander("View Full Correlation Heatmap"):
+        import seaborn as sns
+        numeric_df = raw_df.select_dtypes(include=['number'])
+        correlation_matrix = numeric_df.corr()
+        
+        fig_corr, ax_corr = plt.subplots(figsize=(12, 8))
+        sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5, ax=ax_corr)
+        st.pyplot(fig_corr)
 
     # --- 3. Ethical Considerations ---
     st.subheader("⚖️ Ethical & Social Considerations")
@@ -176,20 +207,19 @@ with tab3:
     with eth_col1:
         st.markdown("""
         **Gentrification Risk**
-        By suggesting prices based on 'Neighborhood Frequency,' the tool may inadvertently encourage price inflation in developing areas, potentially impacting local housing affordability.
+        By suggesting prices based on 'Neighborhood Frequency,' the tool may encourage price inflation in developing areas.
         """)
     
     with eth_col2:
         st.markdown("""
         **The Professional Bias**
-        The model rewards 'Superhost' status and high response rates. This naturally favors professional property managers over casual 'mom-and-pop' hosts who may lack 24/7 staffing.
+        The model rewards 'Superhost' status, favoring professional managers over casual hosts.
         """)
 
     with st.expander("🔍 Note on Proxy Bias"):
         st.write("""
-        Even without demographic data, variables like 'Location Score' and 'Review Ratings' can act as proxies for human bias. 
-        If travelers provide lower ratings to hosts in specific ethnic enclaves, the AI will learn to 'devalue' those listings, 
-        automating existing prejudices into the pricing structure.
+        Variables like 'Location Score' and 'Review Ratings' can act as proxies for human bias. 
+        If travelers provide lower ratings to hosts in specific ethnic enclaves, the AI will learn to 'devalue' those listings.
         """)
 # -------------------- TAB 4 --------------------
 with tab4:
