@@ -43,6 +43,8 @@ st.markdown("""
 def load_data():
     df = pd.read_csv("dublin_aggregated_df(1).csv")
     raw_df = pd.read_csv('dublin_merged_df(1).csv.gz', compression='gzip')
+    raw_df['host_since'] = pd.to_datetime(raw_df['host_since'])
+    raw_df['first_review'] = pd.to_datetime(raw_df['first_review'])
     raw_df['date'] = pd.to_datetime(raw_df['date'])
     raw_df['month'] = raw_df['date'].dt.month
     return df, raw_df
