@@ -169,28 +169,28 @@ with tab3:
     st.markdown("---")
 
     # --- 3. Ethical Considerations ---
-    st.subheader("⚖️ Ethical & Social Considerations")
+   # st.subheader("⚖️ Ethical & Social Considerations")
     
-    eth_col1, eth_col2 = st.columns(2)
+   # eth_col1, eth_col2 = st.columns(2)
     
-    with eth_col1:
-        st.markdown("""
-        **Gentrification Risk**
-        By suggesting prices based on 'Neighborhood Frequency,' the tool may inadvertently encourage price inflation in developing areas, potentially impacting local housing affordability.
-        """)
+    #with eth_col1:
+        #st.markdown("""
+        #**Gentrification Risk**
+        #By suggesting prices based on 'Neighborhood Frequency,' the tool may inadvertently encourage price inflation in developing areas, potentially impacting local housing affordability.
+        #""")
     
-    with eth_col2:
-        st.markdown("""
-        **The Professional Bias**
-        The model rewards 'Superhost' status and high response rates. This naturally favors professional property managers over casual 'mom-and-pop' hosts who may lack 24/7 staffing.
-        """)
+    #with eth_col2:
+        #st.markdown("""
+        #**The Professional Bias**
+        #The model rewards 'Superhost' status and high response rates. This naturally favors professional property managers over casual 'mom-and-pop' hosts who may lack 24/7 staffing.
+        #""")
 
-    with st.expander("🔍 Note on Proxy Bias"):
-        st.write("""
-        Even without demographic data, variables like 'Location Score' and 'Review Ratings' can act as proxies for human bias. 
-        If travelers provide lower ratings to hosts in specific ethnic enclaves, the AI will learn to 'devalue' those listings, 
-        automating existing prejudices into the pricing structure.
-        """)
+    #with st.expander("🔍 Note on Proxy Bias"):
+       # st.write("""
+       # Even without demographic data, variables like 'Location Score' and 'Review Ratings' can act as proxies for human bias. 
+       # If travelers provide lower ratings to hosts in specific ethnic enclaves, the AI will learn to 'devalue' those listings, 
+        #automating existing prejudices into the pricing structure.
+        #""")
 
 # -------------------- TAB 4 --------------------
 with tab4:
