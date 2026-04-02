@@ -254,4 +254,4 @@ with tab4:
         st.metric("Predicted Price (€)", round(price, 2))
 
         # Confidence band (based on RMSE idea)
-        st.info(f"📉 Expected range: €{round(price*0.85,2)} - €{round(price*1.15,2)}")
+        # st.info(f"📉 Expected range: €{round(price*0.85,2)} - €{round(price*1.15,2)}")
