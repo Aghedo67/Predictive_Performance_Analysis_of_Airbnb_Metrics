@@ -115,7 +115,6 @@ def calculate_frequency_encodings(neighbourhood, property_type, df):
 
     return n_freq, p_freq
 # -------------------- TAB 3 --------------------
-# -------------------- TAB 3 --------------------
 with tab3:
     st.subheader("Model Performance & Reliability")
 
@@ -130,8 +129,8 @@ with tab3:
 
     st.markdown("---")
 
-    # --- 2. Feature Importance & Prediction Accuracy ---
-    col_left, col_right = st.columns([1, 1])
+    # --- 2. Feature Importance ---
+    col_left, col_right = st.columns([2, 1])
 
     with col_left:
         st.subheader("📊 Feature Importance (XGBoost)")
@@ -150,68 +149,49 @@ with tab3:
             ]
             fi = pd.DataFrame({"Feature": feature_names, "Importance": model_step.feature_importances_}).sort_values(by="Importance", ascending=True)
             
-            fig_fi, ax_fi = plt.subplots(figsize=(8, 6))
-            ax_fi.barh(fi["Feature"], fi["Importance"], color='#ff5a5f')
-            ax_fi.set_title("Key Drivers of Listing Price")
-            st.pyplot(fig_fi)
+            fig, ax = plt.subplots(figsize=(8, 5))
+            ax.barh(fi["Feature"], fi["Importance"], color='#ff5a5f')
+            ax.set_title("Key Drivers of Listing Price")
+            st.pyplot(fig)
         else:
             st.warning("Feature importance not available.")
 
     with col_right:
-        st.subheader("📈 Actual vs. Predicted (Log Scale)")
-        # Note: In a production app, you would load y_test and y_pred from a file 
-        # For visualization, we use the model's logic:
-        try:
-            # Check if testing data is available in the environment
-            # If not, this section will display a placeholder or note
-            fig_acc, ax_acc = plt.subplots(figsize=(8, 6))
-            
-            # Scatter plot
-            sns.scatterplot(x=raw_df['price_log'].sample(500), y=raw_df['price_log'].sample(500), alpha=0.6, ax=ax_acc)
-            
-            # Perfect Prediction Line (Dummy bounds for visual representation if y_test isn't global)
-            lims = [raw_df['price_log'].min(), raw_df['price_log'].max()]
-            ax_acc.plot(lims, lims, '--r', label='Perfect Prediction')
-            
-            ax_acc.set_xlabel("Actual Price (Log Scale)")
-            ax_acc.set_ylabel("Predicted Price (Log Scale)")
-            ax_acc.legend()
-            ax_acc.grid(True)
-            st.pyplot(fig_acc)
-        except Exception as e:
-            st.info("Upload test results to visualize Actual vs Predicted scatter plot.")
-
-    st.markdown("---")
-
-    # --- 3. Limitations & Ethics ---
-    col_low1, col_low2 = st.columns([1, 2])
-    
-    with col_low1:
         st.subheader("⚠️ Model Limitations")
         st.info("""
         **Unexplained Variance (31%)**
-        The model cannot see 'intangibles' like interior design or professional photography.
+        The model cannot see 'intangibles' like interior design, professional photography, or proximity to specific landmarks.
         
         **The Log-Scale Effect**
-        Because errors are calculated on a log scale, the model may struggle with extreme luxury listings.
+        Because errors are calculated on a log scale, the model may struggle with extreme luxury or extreme budget listings.
         """)
 
-    with col_low2:
-        st.subheader("⚖️ Ethical & Social Considerations")
-        eth_col1, eth_col2 = st.columns(2)
-        with eth_col1:
-            st.markdown("**Gentrification Risk**")
-            st.caption("Suggesting prices based on 'Neighborhood Frequency' may encourage price inflation in developing areas.")
-        with eth_col2:
-            st.markdown("**The Professional Bias**")
-            st.caption("The model rewards 'Superhost' status, favoring professional managers over casual hosts.")
+    st.markdown("---")
+
+    # --- 3. Ethical Considerations ---
+    st.subheader("⚖️ Ethical & Social Considerations")
+    
+    eth_col1, eth_col2 = st.columns(2)
+    
+    with eth_col1:
+        st.markdown("""
+        **Gentrification Risk**
+        By suggesting prices based on 'Neighborhood Frequency,' the tool may inadvertently encourage price inflation in developing areas, potentially impacting local housing affordability.
+        """)
+    
+    with eth_col2:
+        st.markdown("""
+        **The Professional Bias**
+        The model rewards 'Superhost' status and high response rates. This naturally favors professional property managers over casual 'mom-and-pop' hosts who may lack 24/7 staffing.
+        """)
 
     with st.expander("🔍 Note on Proxy Bias"):
         st.write("""
-        Variables like 'Location Score' and 'Review Ratings' can act as proxies for human bias. 
-        If travelers provide lower ratings to hosts in specific ethnic enclaves, the AI will learn 
-        to 'devalue' those listings, automating existing prejudices.
+        Even without demographic data, variables like 'Location Score' and 'Review Ratings' can act as proxies for human bias. 
+        If travelers provide lower ratings to hosts in specific ethnic enclaves, the AI will learn to 'devalue' those listings, 
+        automating existing prejudices into the pricing structure.
         """)
+
 # -------------------- TAB 4 --------------------
 with tab4:
     st.subheader("Enter Property Details")
