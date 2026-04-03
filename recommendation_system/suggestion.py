@@ -13,6 +13,14 @@ from PIL import Image
 import requests
 from io import BytesIO
 
+# Try-Except for plotting libraries to prevent crashes if requirements.txt isn't updated yet
+try:
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    PLOT_AVAILABLE = True
+except ImportError:
+    PLOT_AVAILABLE = False
+
 # 1. PAGE CONFIG
 st.set_page_config(page_title="Dublin StaySelect", page_icon="🍀", layout="wide")
 
@@ -83,54 +91,67 @@ def main():
     raw_df = load_data()
     final_model = load_suggestion_model()
 
-    # Sidebar
+    # Sidebar: Simplified for navigation
     with st.sidebar:
         st.title("🍀 DublinStay")
-        
-        # --- ENHANCED PERFORMANCE METRICS ---
-        st.subheader("📊 Model Stats")
-        st.metric("Training Samples", "276,126") # Added your dataset size
-        c1, c2 = st.columns(2)
-        c1.metric("RMSE", "0.4347")
-        c2.metric("MAE", "0.3205")
-        st.caption("BaselineOnly Model | 5-Fold CV")
         st.markdown("---")
-        
         top_ids = raw_df['reviewer_id'].value_counts().head(5).index.tolist()
         selected_id = st.selectbox("Quick Test Profiles:", top_ids)
+        st.info("Select a User ID to see personalized Dublin recommendations.")
 
-    # Tabs for Organization
-    tab1, tab2 = st.tabs(["🔍 Find Stays", "⚖️ Ethics & Limitations"])
+    # Main Tabs
+    tab1, tab2, tab3 = st.tabs(["🔍 Find Stays", "📊 Model Performance", "⚖️ Limitations"])
 
     with tab1:
         st.title("Personalized Dublin Stays")
+        st.markdown("Discover accommodations tailored to your past preferences in Dublin.")
         user_input = st.number_input("User ID:", value=int(selected_id))
         if st.button("Generate Recommendations"):
             with st.spinner('Analyzing Dublin rentals...'):
                 recommend_airbnbs(user_input, raw_df, final_model)
 
     with tab2:
-        st.header("Project Considerations")
+        st.header("Model Evaluation & Scale")
         
+        # Performance Metrics
+        col_m1, col_m2, col_m3 = st.columns(3)
+        col_m1.metric("Training Samples", "276,126")
+        col_m2.metric("RMSE", "0.4347")
+        col_m3.metric("MAE", "0.3205")
+        
+        st.markdown("---")
+        
+        # Sentiment Distribution
+        if PLOT_AVAILABLE:
+            st.subheader("📈 Training Data Distribution")
+            st.write("This chart shows the sentiment scores (compound_scores) used to train the BaselineOnly model.")
+            fig, ax = plt.subplots(figsize=(10, 4))
+            sns.histplot(raw_df['compound_scores'], kde=True, ax=ax, color="#FF5A5F")
+            ax.set_title("Frequency of Sentiment Scores in Dublin Reviews")
+            st.pyplot(fig)
+        else:
+            st.warning("Visualization libraries (Matplotlib/Seaborn) not yet loaded. Check requirements.txt.")
+
+    with tab3:
+        st.header("Project Considerations")
         col_left, col_right = st.columns(2)
         with col_left:
             st.subheader("⚠️ Technical Limitations")
             st.write(f"""
-            - **Data Volume:** Trained on **276,126** records. While robust, processing high volumes for real-time inference can cause latency.
-            - **Positivity Bias:** Most reviews are highly positive (0.8–1.0), making it hard to distinguish 'good' from 'great'.
-            - **Cold Start:** New listings without reviews cannot be recommended by this model.
-            - **Sentiment vs. Reality:** A score of 0.0 might mean a neutral stay or just a very short, non-descriptive review.
+            - **Supervised Learning:** This model predicts sentiment based on a large labeled dataset.
+            - **Positivity Bias:** Highly skewed data (0.8+) makes distinguishing high-quality stays a challenge.
+            - **Cold Start:** The system requires existing review history to make accurate matches.
             """)
         
-        with col_right:
-            st.subheader("🛡️ Ethical Considerations")
-            st.write("""
-            - **Gentrification Risk:** Highlighting only 'popular' areas can drive up local rents and push out residents.
-            - **Echo Chambers:** The model may limit your discovery by only showing stays similar to what you've seen before.
-            - **Privacy:** Reviewer data is anonymized, but travel patterns can still be sensitive.
-            """)
+        #with col_right:
+            #st.subheader("🛡️ Ethical Considerations")
+            #st.write("""
+            #- **Fairness:** Relying on sentiment can favor hosts who are "polite" over those who offer better value.
+            #- **Market Impact:** Algorithmic bias may concentrate tourism in specific Dublin neighborhoods.
+            #- **Data Privacy:** User history is used anonymously to protect individual identities.
+            #""")
         
-        st.warning("Note: Recommendations are based on historical sentiment and may not reflect current property conditions.")
+        st.warning("Note: Recommendations are based on historical sentiment and may not reflect current conditions.")
 
 if __name__ == "__main__":
     main()
