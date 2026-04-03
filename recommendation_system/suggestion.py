@@ -100,7 +100,7 @@ def main():
         st.info("Select a User ID to see personalized Dublin recommendations.")
 
     # Main Tabs
-    tab1, tab2, tab3 = st.tabs(["🔍 Find Stays", "📊 Model Performance", "⚖️ Ethics & Insights"])
+    tab1, tab2, tab3 = st.tabs(["🔍 Find Stays", "📊 Model Performance", "⚖️ Limitations"])
 
     with tab1:
         st.title("Personalized Dublin Stays")
@@ -143,13 +143,13 @@ def main():
             - **Cold Start:** The system requires existing review history to make accurate matches.
             """)
         
-        with col_right:
-            st.subheader("🛡️ Ethical Considerations")
-            st.write("""
-            - **Fairness:** Relying on sentiment can favor hosts who are "polite" over those who offer better value.
-            - **Market Impact:** Algorithmic bias may concentrate tourism in specific Dublin neighborhoods.
-            - **Data Privacy:** User history is used anonymously to protect individual identities.
-            """)
+        #with col_right:
+            #st.subheader("🛡️ Ethical Considerations")
+            #st.write("""
+            #- **Fairness:** Relying on sentiment can favor hosts who are "polite" over those who offer better value.
+            #- **Market Impact:** Algorithmic bias may concentrate tourism in specific Dublin neighborhoods.
+            #- **Data Privacy:** User history is used anonymously to protect individual identities.
+            #""")
         
         st.warning("Note: Recommendations are based on historical sentiment and may not reflect current conditions.")
 
