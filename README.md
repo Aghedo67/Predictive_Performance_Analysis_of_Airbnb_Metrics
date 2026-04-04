@@ -307,8 +307,9 @@ Surprise Library
 NLP (Sentiment Analysis)
 
 Streamlit
-https://colab.research.google.com/drive/1CWxsgGzSSbPbTedovPkWkYgH9udlfQs4#scrollTo=NIjFTQ_CRu0s (Analysis)
 
+
+# Large Analysis: https://colab.research.google.com/drive/1CWxsgGzSSbPbTedovPkWkYgH9udlfQs4#scrollTo=NIjFTQ_CRu0s
 
 # Interactive Dashboard (Artefact)
 Here is a link to a User Friendly interface for Airbnb Price suggestion / recommender System:
