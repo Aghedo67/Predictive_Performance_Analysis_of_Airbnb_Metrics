@@ -138,7 +138,7 @@ def main():
         with col_left:
             st.subheader("⚠️ Technical Limitations")
             st.write(f"""
-            # - **Supervised Learning:** This model predicts sentiment based on a large labeled dataset.
+            #**Supervised Learning:** This model predicts sentiment based on a large labeled dataset.
             - **Positivity Bias:** Highly skewed data (0.8+) makes distinguishing high-quality stays a challenge.
             - **Cold Start:** The system requires existing review history to make accurate matches.
             """)
