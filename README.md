@@ -149,6 +149,9 @@ Test MAE: 0.2665
 
 R² Score: 0.6925
 
+<img width="1389" height="589" alt="image" src="https://github.com/user-attachments/assets/87918128-ae9b-44b1-9ab7-e0749ebb2d27" />
+
+
 - 🔁 Cross-Validation Performance:
 
 CV RMSE: 0.3784
@@ -156,6 +159,9 @@ CV RMSE: 0.3784
 CV MAE: 0.2721
 
 CV R² Score: 0.6918
+
+<img width="1390" height="590" alt="image" src="https://github.com/user-attachments/assets/8abf05b3-fb8a-4618-b936-2624e64f7d61" />
+
 
 ## 📌 Interpretation:
 
@@ -165,7 +171,7 @@ The model explains approximately 69% of price variability.
 
 Consistent cross-validation results confirm robustness and stability.
 
-## 2️⃣ Collaborative Filtering – BaselineOnly
+- 2️⃣ Collaborative Filtering – BaselineOnly
 
 The BaselineOnly algorithm was evaluated using 5-fold cross-validation.
 
@@ -180,6 +186,9 @@ MAE	0.3102	0.3080	0.3100	0.3123	0.3101	0.3101	0.0014
 Average Fit Time: 4.68 seconds
 
 Average Test Time: 0.58 seconds
+
+<img width="1389" height="589" alt="image" src="https://github.com/user-attachments/assets/49cecc10-12bb-4ad2-a16a-dab44d8ff8ff" />
+
 
 - 📌 Interpretation:
 
