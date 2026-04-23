@@ -323,7 +323,7 @@ Large Analysis: https://colab.research.google.com/drive/1CWxsgGzSSbPbTedovPkWkYg
 # Interactive Dashboard (Artefact)
 Here is a link to a User Friendly interface for Airbnb Price suggestion / recommender System:
 
-<img width="1064" height="798" alt="image" src="https://github.com/user-attachments/assets/a834f31f-06ca-4f19-b0d0-0918bf46b187" />
+<img width="391" height="398" alt="image" src="https://github.com/user-attachments/assets/2293207f-96c3-451b-ae16-c9d050610655" />
 
 - https://airbnbpredictclean-z5ff34yvmkqmbfbgywf5fv.streamlit.app/ (Price)
 - https://airbnbpredictclean-olwqxxkr2hyxaxsdhxyoxr.streamlit.app/ (Recommendation System)
